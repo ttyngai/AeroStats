@@ -18,7 +18,7 @@
   }
   // Plug in planes here using flight data
 
-  // Plug in planes here
+  // Plug in planes end
   var map = L.map('map').fitBounds([
     [latMin, longMax],
     [latMax, longMin],
@@ -38,10 +38,18 @@
   ).addTo(map);
   //Detects pan, provides new bounds, top right corner(north east) & bottom left corner(southWest)
   map.on('moveend', function () {
-    localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
-
+    // localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
+    fastGetBounds();
     // refresh right after scrolling, carrying bounds data
     window.location.href = '/';
   });
+  // Makes for smoother scroll right up till refresh
+  function fastGetBounds() {
+    localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
+    console.log(localStorage.aeroStatsBounds);
+    setTimeout(function () {
+      fastGetBounds();
+    }, 1);
+  }
 </script>
 {% endblock %}
