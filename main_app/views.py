@@ -1,7 +1,9 @@
+from fileinput import close
 from random import sample
 from django.shortcuts import render
 import json
 import math
+
 
 # Add the following import
 from django.http import HttpResponse
@@ -19,18 +21,7 @@ class Flight:
     self.true_track = true_track
     self.vertical_rate = vertical_rate
     self.distance_from_self = distance_from_self
-    # obj = {
-    #   'callsign': flight[1],
-    #   'time_position': flight[3],
-    #   'longitude': flight[5],
-    #   'latitude': flight[6],
-    #   'baro_altitude': flight[7],
-    #   'on_ground': flight[8],
-    #   'velocity': flight[9],
-    #   'true_track': flight[10],
-    #   'vertical_rate': flight[11],
-    #   'distance_from_self': distance_from_self,
-    # }
+
 # Define the home view
 def home(request):
   # Fetch data and store in variable
@@ -56,8 +47,8 @@ def home(request):
 
   # closest 100 flights
   closest_flights = sort_flight_by_distance[:100]
-  for idx, flight in enumerate(closest_flights):
-    print(idx, flight.distance_from_self, flight.callsign, flight.latitude, flight.longitude)
-
+  # print((closest_flights))
+  # for flight in closest_flights:
+  #   print(flight.callsign)
   # slice list to take top 100(closest) flights
-  return render(request, 'home.html')
+  return render(request, 'home.html', {'closest_flights': closest_flights})
