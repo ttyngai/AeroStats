@@ -1,5 +1,17 @@
 {% extends 'base.html' %} {% block content %}
-<div id="map" style="height: 100vh; width: 100vw"></div>
+<map onclick="hideWatchlist();">
+  <div id="map" style="width: 100vw; height: 100vh; z-index: 0"></div>
+</map>
+<watchlist>
+  <div id="watchlist" class="watchlist-hide" style="
+  width: 90vw;
+  height: 80vh;
+  padding: 10vw; border: 1vh solid lightgray; border-radius: 5vh; position: absolute; top: 10vh; left: 10vh; z-index: 0; background-color: white; opacity: .8;">
+    <h1>Watchlist</h1>
+    <a href="#">{{ flight.callsign }}tex ttext tex tex text</a>
+  
+  </div>
+</watchlist>
 
 <script>
   // Shane's default bounds, need to find how to get self location + bounds
@@ -48,8 +60,10 @@
   L.marker([
   {{flight.latitude}},{{flight.longitude}},
   ], {
-  }).addTo(map);
-
+  }).addTo(map)
+  
+  .bindPopup(`<a href="#" onclick="showWatchlist();">{{ flight.callsign }}</a>`);
+  
   // Assign rotational attribute
   document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].setAttribute('true_track', {{flight.true_track}});
 
@@ -93,5 +107,24 @@
         return 'n'+coord*-10000000000000000
     }
   }
+
+  function showWatchlist() {
+    document.getElementById('watchlist').classList.remove('watchlist-hide');
+    document.getElementById('watchlist').classList.add('watchlist-unhide');
+  }
+  function hideWatchlist() {
+    if(document.getElementById('watchlist').classList.contains('watchlist-unhide')) {
+      document.getElementById('watchlist').classList.remove('watchlist-unhide');
+      document.getElementById('watchlist').classList.add('watchlist-show');
+    } else {
+      document.getElementById('watchlist').classList.remove('watchlist-show');
+      document.getElementById('watchlist').classList.add('watchlist-hide');
+    }
+  }
+  
 </script>
+
+
+
+
 {% endblock %}
