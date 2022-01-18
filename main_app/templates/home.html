@@ -62,11 +62,18 @@
     // localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
     const gotBounds = fastGetBounds();
     // refresh right after scrolling, carrying bounds data
-    window.location.href = `/update/${
-      gotBounds._northEast.lat* 10000000000000000
-    }/${gotBounds._southWest.lat * 10000000000000000}/${
-      gotBounds._northEast.lng * -10000000000000000
-    }/${gotBounds._southWest.lng * -10000000000000000}/`;
+
+    // let latMinId, latMaxId, longMinId, longMaxId;
+    let latMinId = gotBounds._northEast.lat
+    latMinId = latLongSign(latMinId)
+    let latMaxId = gotBounds._southWest.lat
+    latMaxId = latLongSign(latMaxId)
+    let longMinId = gotBounds._northEast.lng
+    longMinId = latLongSign(longMinId)
+    let longMaxId = gotBounds._southWest.lng
+    longMaxId = latLongSign(longMaxId)
+
+    window.location.href = `/update/${latMinId}/${latMaxId}/${longMinId}/${longMaxId}/`;
   });
   // Makes for smoother scroll right up till refresh
   function fastGetBounds() {
@@ -75,6 +82,15 @@
     setTimeout(function () {
       fastGetBounds();
     }, 10);
+  }
+
+  function latLongSign(coord){
+    if (coord>0){
+        return 'p'+coord*10000000000000000
+    } else {
+        return 'n'+coord*-10000000000000000
+    }
+
   }
 </script>
 {% endblock %}

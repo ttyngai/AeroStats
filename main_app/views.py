@@ -40,13 +40,6 @@ def home(request):
   }
   flight_data_parsed=[]
   for flight in flight_data['states']:
-    # Parsing data/including distance from self
-    # long_delta = flight[5]-sample_self_coordinates['long']
-    # lat_delta = flight[6]-sample_self_coordinates['lat']
-    # distance_from_self = math.sqrt((long_delta*long_delta)+(lat_delta*lat_delta))
-
-    # NEED TO DO: Should check if all data(at least the important ones) are present, or if in the sky
-
     obj = Flight(flight[1], flight[3], flight[5], flight[6], flight[7], flight[8], flight[9], flight[10], flight[11])
     flight_data_parsed.append(obj)
   # Sort flight by distance from self
@@ -64,10 +57,17 @@ def home(request):
 
 def home_update(request, latMax, latMin, longMax, longMin):
   # need to get request from that refresh
-  latMin = latMin/10000000000000000
-  latMax = latMax/10000000000000000
-  longMin = -(longMin/10000000000000000)
-  longMax = -(longMax/10000000000000000)
+
+  convert_lat_long(latMax)
+
+
+
+
+  latMin = convert_lat_long(latMin)
+  latMax = convert_lat_long(latMax)
+  longMin = convert_lat_long(longMin)
+  longMax = convert_lat_long(longMax)
+
   # Fetch data and store in variable
   flight_data = requests.get(f'https://opensky-network.org/api/states/all?lamin={latMin}&lomin={longMin}&lamax={latMax}&lomax={longMax}').json()
   # Parsing data/Adding key to match sighting model
@@ -100,3 +100,11 @@ def home_update(request, latMax, latMin, longMax, longMin):
   #   print(idx, flight.distance_from_self)
   # slice list to take top 100(closest) flights
   return render(request, 'home.html', {'flight_data_parsed': flight_data_parsed})
+
+
+def convert_lat_long(coord):
+  if coord[0] == 'p':
+    return int(coord[1:])/10000000000000000
+  else:
+    return int(coord[1:])/-10000000000000000
+   
