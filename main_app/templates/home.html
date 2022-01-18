@@ -39,11 +39,8 @@
         'pk.eyJ1Ijoic2R1cHJlZSIsImEiOiJja3hpNXoyNGw0dWUxMnBtdTQ5ZjI4MmZsIn0.19iQPPtrr4jFeqmOLEJ1BA',
     }
   ).addTo(map);
-
-    let id = 0
   {% for flight in flight_data_parsed%}
-
-  id++
+  // Add icon
   var myIcon = L.divIcon({className: 'my-div-icon'});
   L.marker([
   {{flight.latitude}},{{flight.longitude}},
@@ -56,11 +53,8 @@
   // Rotate!
   document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].style.transform = `${  document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].style.transform} rotate(${  document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].getAttribute('true_track')}deg)`
 
-  // Remove leftover shadow
-
-
   {% endfor %}
-
+   // Remove leftover shadow
   document.getElementsByClassName('leaflet-shadow-pane')[0].remove()
 
   //Detects pan, provides new bounds, top right corner(north east) & bottom left corner(southWest)
@@ -69,7 +63,7 @@
     const gotBounds = fastGetBounds();
     // refresh right after scrolling, carrying bounds data
     window.location.href = `/update/${
-      gotBounds._northEast.lat * 10000000000000000
+      gotBounds._northEast.lat* 10000000000000000
     }/${gotBounds._southWest.lat * 10000000000000000}/${
       gotBounds._northEast.lng * -10000000000000000
     }/${gotBounds._southWest.lng * -10000000000000000}/`;
@@ -84,6 +78,3 @@
   }
 </script>
 {% endblock %}
-document.getElementsByClassName('leaflet-marker-icon')[4].style.transform =
-`${document.getElementsByClassName('leaflet-marker-icon')[4].style.transform}
-rotate(${document.getElementsByClassName('leaflet-marker-icon')[4].getAttribute('true_track')}deg)`
