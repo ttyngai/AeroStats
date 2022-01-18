@@ -1,5 +1,5 @@
 {% extends 'base.html' %} {% block content %}
-<map onclick="hideWatchlist();">
+<map onclick="hideWatchlist(); hideNav();">
   <div id="map" style="width: 100vw; height: 100vh; z-index: 0"></div>
 </map>
 <watchlist>
@@ -9,10 +9,38 @@
   padding: 10vw; border: 1vh solid lightgray; border-radius: 5vh; position: absolute; top: 10vh; left: 10vh; z-index: 0; background-color: white; opacity: .8;">
     <h1>Watchlist</h1>
     <a href="#">{{ flight.callsign }}tex ttext tex tex text</a>
-  
+
   </div>
 </watchlist>
+<nav-container>
+    <div id="nav" class="nav-hide" style="
+    /* width: 25vw;
+    height: 40vh; */
+    border: 1vh solid lightgray; border-radius: 5vh; position: absolute; top: 10vh; left: 80vh; z-index: 0; background-color: white; opacity: .8;">
+      <ul>
+        <li><a href="#!">one</a></li>
+        <li><a href="#!">two</a></li>
+        <li class="divider"></li>
+        <li><a href="#!">three</a></li>
+      </ul>
 
+    </div>
+</nav-container>
+<menu-button>
+    <div id="menu-button" style="
+    /* width: 25vw;
+    height: 40vh; */
+    border: 1vh solid lightgray;
+    border-radius: 5vh;
+    position: absolute;
+    top: 5vh;
+    left: 85vh;
+    z-index: 0;
+    background-color: white;
+    opacity: .8;">
+      <h2><a href="#" onclick="showMenu()">Menu</a></h2>
+    </div>
+</menu-button>
 <script>
   // Shane's default bounds, need to find how to get self location + bounds
   let latMax = 44;
@@ -61,9 +89,9 @@
   {{flight.latitude}},{{flight.longitude}},
   ], {
   }).addTo(map)
-  
+
   .bindPopup(`<a href="#" onclick="showWatchlist();">{{ flight.callsign }}</a>`);
-  
+
   // Assign rotational attribute
   document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].setAttribute('true_track', {{flight.true_track}});
 
@@ -121,7 +149,17 @@
       document.getElementById('watchlist').classList.add('watchlist-hide');
     }
   }
-  
+  function showMenu() {
+    document.getElementById('nav').classList.remove('nav-hide');
+    document.getElementById('nav').classList.add('nav-show');
+  }
+  function hideMenu() {
+
+    document.getElementById('nav').classList.remove('nav-show');
+    document.getElementById('nav').classList.add('nav-hide');
+  }
+
+
 </script>
 
 
