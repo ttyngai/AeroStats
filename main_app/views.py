@@ -41,26 +41,28 @@ def home(request):
   flight_data_parsed=[]
   for flight in flight_data['states']:
     # Parsing data/including distance from self
-    long_delta = flight[5]-sample_self_coordinates['long']
-    lat_delta = flight[6]-sample_self_coordinates['lat']
-    distance_from_self = math.sqrt((long_delta*long_delta)+(lat_delta*lat_delta))
+    # long_delta = flight[5]-sample_self_coordinates['long']
+    # lat_delta = flight[6]-sample_self_coordinates['lat']
+    # distance_from_self = math.sqrt((long_delta*long_delta)+(lat_delta*lat_delta))
 
     # NEED TO DO: Should check if all data(at least the important ones) are present, or if in the sky
 
-    obj = Flight(flight[1], flight[3], flight[5], flight[6], flight[7], flight[8], flight[9], flight[10], flight[11], distance_from_self)
+    obj = Flight(flight[1], flight[3], flight[5], flight[6], flight[7], flight[8], flight[9], flight[10], flight[11])
     flight_data_parsed.append(obj)
   # Sort flight by distance from self
-  sort_flight_by_distance = sorted(flight_data_parsed, key=lambda flight: flight.distance_from_self)
+
 
   # closest 100 flights
-  closest_flights = sort_flight_by_distance[:100]
+  # closest_flights = flight_data_parsed
   # print((closest_flights))
-  for idx, flight in enumerate(closest_flights):
-    print(idx, flight.distance_from_self)
+  # for idx, flight in enumerate(closest_flights):
+  #   print(idx, flight.distance_from_self)
   # slice list to take top 100(closest) flights
-  return render(request, 'home.html', {'closest_flights': closest_flights})
+  return render(request, 'home.html', {'flight_data_parsed': flight_data_parsed})
 
-def home_update(request, latMax, latMin, longMax,longMin):
+
+
+def home_update(request, latMax, latMin, longMax, longMin):
   # need to get request from that refresh
   latMin = latMin/10000000000000000
   latMax = latMax/10000000000000000
