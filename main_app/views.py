@@ -79,7 +79,7 @@ def home_update(request, latMax, latMin, longMax, longMin):
       # distance_from_self = math.sqrt((long_delta*long_delta)+(lat_delta*lat_delta))
 
       # NEED TO DO: Should check if all data(at least the important ones) are present, or if in the sky
-      if flight[8] == False:
+      if flight[8] == False or flight[1] == None:
         obj = Flight(flight[1], flight[3], flight[5], flight[6], flight[7], flight[8], flight[9], flight[10], flight[11])
         flight_data_parsed.append(obj)
   # Sort flight by distance from self

@@ -1,3 +1,18 @@
 .leaflet-interactive {
   transform: rotate(90deg);
 }
+
+
+.watchlist-show {
+  display: block;
+}
+
+.watchlist-hide {
+  display: none;
+}
+
+.watchlist-unhide {
+  display: none;
+}
+
+
