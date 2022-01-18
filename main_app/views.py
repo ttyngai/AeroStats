@@ -26,10 +26,10 @@ class Flight:
 def home(request):
 
   # need to get request from that refresh
-  request.latmin = 43
-  request.latmax = 55
-  request.longmin = -75
-  request.longmax = -70
+  request.latmin = 35
+  request.latmax = 39
+  request.longmin = -123
+  request.longmax = -116
   # Fetch data and store in variable
 
   flight_data = requests.get(f'https://opensky-network.org/api/states/all?lamin={request.latmin}&lomin={request.longmin}&lamax={request.latmax}&lomax={request.longmax}').json()
@@ -39,7 +39,7 @@ def home(request):
     obj = Flight(flight[1], flight[3], flight[5], flight[6], flight[7], flight[8], flight[9], flight[10], flight[11])
     flight_data_parsed.append(obj)
   # Sort flight by distance from self
-
+ 
 
   # closest 100 flights
   # closest_flights = flight_data_parsed
@@ -83,10 +83,9 @@ def home_update(request, latMax, latMin, longMax, longMin):
         obj = Flight(flight[1], flight[3], flight[5], flight[6], flight[7], flight[8], flight[9], flight[10], flight[11])
         flight_data_parsed.append(obj)
   # Sort flight by distance from self
-  sort_flight_by_distance = flight_data_parsed
 
   # closest 100 flights
-  closest_flights = sort_flight_by_distance
+  # closest_flights = sort_flight_by_distance
   # print((closest_flights))
   # for idx, flight in enumerate(closest_flights):
   #   print(idx, flight.distance_from_self)
