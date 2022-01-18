@@ -16,3 +16,15 @@
 }
 
 
+.nav-show {
+  display: block;
+}
+
+.nav-hide {
+  display: none;
+}
+
+.nav-unhide {
+  display: none;
+}
+
