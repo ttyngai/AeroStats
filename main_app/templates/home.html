@@ -1,5 +1,5 @@
 {% extends 'base.html' %} {% block content %}
-<map onclick="hideWatchlist(); hideNav();">
+<map onclick="hideWatchlist(); hideMenu();">
   <div id="map" style="width: 100vw; height: 100vh; z-index: 0"></div>
 </map>
 <watchlist>
@@ -13,32 +13,36 @@
   </div>
 </watchlist>
 <nav-container>
-    <div id="nav" class="nav-hide" style="
-    /* width: 25vw;
-    height: 40vh; */
-    border: 1vh solid lightgray; border-radius: 5vh; position: absolute; top: 10vh; left: 80vh; z-index: 0; background-color: white; opacity: .8;">
-      <ul>
-        <li><a href="#!">one</a></li>
-        <li><a href="#!">two</a></li>
-        <li class="divider"></li>
-        <li><a href="#!">three</a></li>
-      </ul>
+  <div id="nav" class="nav-hide" style="
+  border: 1vh solid lightgray;
+  border-radius: 5vh;
+  position: absolute;
+  top: 10vh;
+  right: 1vw;
+  z-index: 0;
+  background-color: white;
+  opacity: .8;">
+    <ul>
+      <li><a href="#!">one</a></li>
+      <li><a href="#!">two</a></li>
+      <li class="divider"></li>
+      <li><a href="#!">three</a></li>
+    </ul>
 
-    </div>
+  </div>
 </nav-container>
 <menu-button>
     <div id="menu-button" style="
-    /* width: 25vw;
-    height: 40vh; */
+    /*height: 3vh;*/
     border: 1vh solid lightgray;
     border-radius: 5vh;
     position: absolute;
-    top: 5vh;
-    left: 85vh;
+    top: 1vh;
+    right: 1vw;
     z-index: 0;
     background-color: white;
     opacity: .8;">
-      <h2><a href="#" onclick="showMenu()">Menu</a></h2>
+      <a href="#" onclick="showMenu()"><span style="font-size: 5vh;">✈️ AeroStats [=]</span></a>
     </div>
 </menu-button>
 <script>
