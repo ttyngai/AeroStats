@@ -41,17 +41,20 @@
   ).addTo(map);
   {% for flight in flight_data_parsed%}
   // Add icon
-  var myIcon = L.divIcon({className: 'my-div-icon'});
+
+  L.Icon.Default.imagePath = "https://www.clipartmax.com/png/full/333-3330249_113-origami-icons-plane-icon-outline-png.png"
+  // L.Icon.Default.imagePath = "static/images/plane_icon.png"
+
   L.marker([
   {{flight.latitude}},{{flight.longitude}},
   ], {
-  },{icon: myIcon}).addTo(map);
+  }).addTo(map);
 
   // Assign rotational attribute
   document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].setAttribute('true_track', {{flight.true_track}});
 
   // Rotate!
-  document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].style.transform = `${  document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].style.transform} rotate(${  document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].getAttribute('true_track')}deg)`
+  document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].style.transform = `${document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].style.transform} rotate(${document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].getAttribute('true_track')}deg)`
 
   {% endfor %}
    // Remove leftover shadow
@@ -60,7 +63,7 @@
   //Detects pan, provides new bounds, top right corner(north east) & bottom left corner(southWest)
   map.on('moveend', function () {
     // localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
-    const gotBounds = fastGetBounds();
+    let gotBounds = fastGetBounds();
     // refresh right after scrolling, carrying bounds data
 
     // let latMinId, latMaxId, longMinId, longMaxId;
@@ -72,7 +75,6 @@
     longMinId = latLongSign(longMinId)
     let longMaxId = gotBounds._southWest.lng
     longMaxId = latLongSign(longMaxId)
-
     window.location.href = `/update/${latMinId}/${latMaxId}/${longMinId}/${longMaxId}/`;
   });
   // Makes for smoother scroll right up till refresh
@@ -90,7 +92,6 @@
     } else {
         return 'n'+coord*-10000000000000000
     }
-
   }
 </script>
 {% endblock %}
