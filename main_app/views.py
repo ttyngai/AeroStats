@@ -25,7 +25,7 @@ class Flight:
 # Define the home view
 def home(request):
 
-  # need to get request from that refresh
+  # need to get  request from that refresh
   request.latmin = 35
   request.latmax = 39
   request.longmin = -123
