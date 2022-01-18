@@ -91,7 +91,7 @@ def home_update(request, latMax, latMin, longMax,longMin):
   sort_flight_by_distance = sorted(flight_data_parsed, key=lambda flight: flight.distance_from_self)
 
   # closest 100 flights
-  closest_flights = sort_flight_by_distance[:100]
+  closest_flights = sort_flight_by_distance
   # print((closest_flights))
   for idx, flight in enumerate(closest_flights):
     print(idx, flight.distance_from_self)
