@@ -3,7 +3,7 @@
   <div id="map" style="width: 100vw; height: 100vh; z-index: 0"></div>
 </map>
 <watchlist>
-  <div id="watchlist" class="watchlist-show" style="
+  <div id="watchlist" class="watchlist-hide" style="
   width: 90vw;
   height: 80vh;
   padding: 10vw; border: 1vh solid lightgray; border-radius: 5vh; position: absolute; top: 10vh; left: 10vh; z-index: 0; background-color: white; opacity: .8;">
@@ -109,14 +109,17 @@
   }
 
   function showWatchlist() {
-    alert("Show");
     document.getElementById('watchlist').classList.remove('watchlist-hide');
-    document.getElementById('watchlist').classList.add('watchlist-show');
+    document.getElementById('watchlist').classList.add('watchlist-unhide');
   }
   function hideWatchlist() {
-    alert("Hi");
-    document.getElementById('watchlist').classList.remove('watchlist-show');
-    document.getElementById('watchlist').classList.add('watchlist-hide');
+    if(document.getElementById('watchlist').classList.contains('watchlist-unhide')) {
+      document.getElementById('watchlist').classList.remove('watchlist-unhide');
+      document.getElementById('watchlist').classList.add('watchlist-show');
+    } else {
+      document.getElementById('watchlist').classList.remove('watchlist-show');
+      document.getElementById('watchlist').classList.add('watchlist-hide');
+    }
   }
   
 </script>
