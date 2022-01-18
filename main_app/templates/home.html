@@ -41,23 +41,19 @@
     ).addTo(map);
 
 
-  {% for flight in closest_flights%}
-
-  L.marker([
-
-  {{flight.latitude}},{{flight.longitude}},
-
-
-  ]).addTo(map);
-
-
-  {% endfor %}
+    {% for flight in flight_data_parsed%}
+    var myIcon = L.divIcon({className: 'my-div-icon'});
+    L.marker([
+    {{flight.latitude}},{{flight.longitude}},
+    ], {
+      rotationAngle: 78
+  },{icon: myIcon}).addTo(map);
+    {% endfor %}
 
     //Detects pan, provides new bounds, top right corner(north east) & bottom left corner(southWest)
     map.on('moveend', function () {
       // localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
       const gotBounds = fastGetBounds();
-      console.log(gotBounds);
       // refresh right after scrolling, carrying bounds data
       window.location.href = `/update/${
         gotBounds._northEast.lat * 10000000000000000
@@ -69,7 +65,6 @@
     function fastGetBounds() {
       localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
       return map.getBounds();
-      console.log(localStorage.aeroStatsBounds);
       setTimeout(function () {
         fastGetBounds();
       }, 10);
