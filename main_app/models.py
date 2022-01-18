@@ -13,3 +13,7 @@ class Sighting(models.Model):
   true_track = models.FloatField()
   vertical_rate = models.FloatField()
   user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class Plane(models.Model):
+  callsign = models.CharField(max_length = 8)
+

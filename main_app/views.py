@@ -1,8 +1,11 @@
 from fileinput import close
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from random import sample
 from django.shortcuts import render
 import json
 import math
+from .models import Plane
+
 
 
 # Add the following import
@@ -39,7 +42,7 @@ def home(request):
     obj = Flight(flight[1], flight[3], flight[5], flight[6], flight[7], flight[8], flight[9], flight[10], flight[11])
     flight_data_parsed.append(obj)
   # Sort flight by distance from self
- 
+
 
   # closest 100 flights
   # closest_flights = flight_data_parsed
@@ -73,7 +76,7 @@ def home_update(request, latMax, latMin, longMax, longMin):
   if flight_data['states']:
     for flight in flight_data['states']:
       # Parsing data/including distance from self
-      
+
       # long_delta = flight[5]-sample_self_coordinates['long']
       # lat_delta = flight[6]-sample_self_coordinates['lat']
       # distance_from_self = math.sqrt((long_delta*long_delta)+(lat_delta*lat_delta))
@@ -98,4 +101,15 @@ def convert_lat_long(coord):
     return int(coord[1:])/10000000000000000
   else:
     return int(coord[1:])/-10000000000000000
-   
+
+class PlaneCreate(CreateView):
+  model = Plane
+  fields = ['callsign']
+
+class PlaneUpdate(UpdateView):
+  model = Plane
+  fields = ['callsign']
+
+class PlaneDelete(DeleteView):
+  model = Plane
+  success_url = '/planes/'
