@@ -1,61 +1,66 @@
 {% extends 'base.html' %} {% block content %}
 <div id="map" style="height: 100vh; width: 100vw"></div>
-<script>
-    // Shane's default bounds, need to find how to get self location + bounds
-    let latMax = 44;
-    let latMin = 43;
-    let longMax = -73;
-    let longMin = -74;
-    // If scrolled previously, bounds would be saved in localStorage.bounds
-    let newBounds;
-    if (localStorage.aeroStatsBounds) {
-      console.log(localStorage.aeroStatsBounds);
-      newBounds = JSON.parse(localStorage.aeroStatsBounds);
-      latMax = newBounds._northEast.lat;
-      latMin = newBounds._southWest.lat;
-      longMax = newBounds._northEast.lng;
-      longMin = newBounds._southWest.lng;
-    }
-    // Plug in planes here using flight data
-    //   const f = {{closest_flights}};
-    //   console.log(f);
 
-    {% for flight in closest_flights%}
-  console.log('{{flight.velocity}}')
+<script>
+  // Shane's default bounds, need to find how to get self location + bounds
+  let latMax = 44;
+  let latMin = 43;
+  let longMax = -73;
+  let longMin = -74;
+  // If scrolled previously, bounds would be saved in localStorage.bounds
+  let newBounds;
+  if (localStorage.aeroStatsBounds) {
+    console.log(localStorage.aeroStatsBounds);
+    newBounds = JSON.parse(localStorage.aeroStatsBounds);
+    latMax = newBounds._northEast.lat;
+    latMin = newBounds._southWest.lat;
+    longMax = newBounds._northEast.lng;
+    longMin = newBounds._southWest.lng;
+  }
+  // Plug in planes here using flight data
+  //   const f = {{closest_flights}};
+  //   console.log(f);
+
+  {% for flight in closest_flights%}
+  console.log('{{flight.latitude}}', '{{flight.longitude}}')
   {% endfor %}
 
-    // Plug in planes end
-    var map = L.map('map').fitBounds([
-      [latMin, longMax],
-      [latMax, longMin],
-    ]);
-    L.tileLayer(
-      'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
-      {
-        attribution:
-          'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        maxZoom: 18,
-        id: 'mapbox/streets-v11',
-        tileSize: 512,
-        zoomOffset: -1,
-        accessToken:
-          'pk.eyJ1Ijoic2R1cHJlZSIsImEiOiJja3hpNXoyNGw0dWUxMnBtdTQ5ZjI4MmZsIn0.19iQPPtrr4jFeqmOLEJ1BA',
-      }
-    ).addTo(map);
-    //Detects pan, provides new bounds, top right corner(north east) & bottom left corner(southWest)
-    map.on('moveend', function () {
-      // localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
-      fastGetBounds();
-      // refresh right after scrolling, carrying bounds data
-      window.location.href = '/';
-    });
-    // Makes for smoother scroll right up till refresh
-    function fastGetBounds() {
-      localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
-      console.log(localStorage.aeroStatsBounds);
-      setTimeout(function () {
-        fastGetBounds();
-      }, 10);
+  // Plug in planes end
+  var map = L.map('map').fitBounds([
+    [latMin, longMax],
+    [latMax, longMin],
+  ]);
+  L.tileLayer(
+    'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
+    {
+      attribution:
+        'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      maxZoom: 18,
+      id: 'mapbox/streets-v11',
+      tileSize: 512,
+      zoomOffset: -1,
+      accessToken:
+        'pk.eyJ1Ijoic2R1cHJlZSIsImEiOiJja3hpNXoyNGw0dWUxMnBtdTQ5ZjI4MmZsIn0.19iQPPtrr4jFeqmOLEJ1BA',
     }
+
+  ).addTo(map);
+  //Detects pan, provides new bounds, top right corner(north east) & bottom left corner(southWest)
+  map.on('moveend', function () {
+    // localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
+    const gotBounds = fastGetBounds();
+    console.log(gotBounds)
+    // refresh right after scrolling, carrying bounds data
+    window.location.href = `/update/${gotBounds._northEast.lat*1000000000000000}/${gotBounds._southWest.lat*1000000000000000}/${gotBounds._northEast.lng*-1000000000000000}/${gotBounds._southWest.lng*-1000000000000000}/`;
+  });
+  // Makes for smoother scroll right up till refresh
+  function fastGetBounds() {
+    localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
+    return map.getBounds()
+    console.log(localStorage.aeroStatsBounds);
+    setTimeout(function () {
+      fastGetBounds();
+    }, 10);
+  }
 </script>
 {% endblock %}
+/4918809185085922/4918612140299068/12316907644271852/12317300319671632/
