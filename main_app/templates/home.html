@@ -133,13 +133,15 @@
               L.marker([f[6], f[5]])
                 .addTo(map)
                 .bindPopup(
-                  `<p>Callsign: ${f[1]}</p><p>Origin: ${f[2]}</p><p>${
-                    f[8] ? 'Landed' : `Airborne at ${f[7]} m `
-                  }</p><p>Airspeed: ${f[9]} m/s at ${f[10]}° N</p><p>${
+                  `<h5>Aircraft Details</h5><div>Place of Origin: ${f[2].toUpperCase()}</div><div>Callsign: ${f[1].toUpperCase()}</div><div>Transponder: ${f[0].toUpperCase()}</div><br><div>${
+                    f[8] ? 'Aircraft Grounded' : `Airborne at ${f[7]} m `
+                  }</div><div>Airspeed: ${f[9]} m/s</div><div>Bearing: ${
+                    f[10]
+                  }°N</div><div>${
                     f[11] < 0 ? 'Descending' : 'Ascending'
                   } at ${Math.abs(
                     f[11]
-                  )} m/s</p><form action="/planes/create/" method="post">
+                  )} m/s</div><br><form action="/planes/create/" method="post">
             {% csrf_token %}
             <input value="${f[1]}" type="hidden" name="callsign">
             <input type="submit" value="Add to Watchlist" class="btn">
@@ -207,15 +209,19 @@
 
   // Test find plane example
   // findPlane('N168SU');
-  // call anyplane in the world with this callsign
+  // call anyplane in the world with this callsign or icao24(Transponder hex string)
   async function findPlane(callsign) {
     await fetch(`https://opensky-network.org/api/states/all`)
       .then((res) => res.json())
       .then((data) => {
         let plane = data.states.find(function (p) {
-          return p[1].includes(callsign);
+          return p[0].includes(callsign) || p[1].includes(callsign);
         });
-        map.setView([plane[6], plane[5]]);
+        if (plane) {
+          map.setView([plane[6], plane[5]]);
+        } else {
+          console.log(`${callsign} Not Found`);
+        }
       });
   }
   // User's last viewed map location
