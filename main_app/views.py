@@ -7,7 +7,8 @@ from .models import Plane
 from .forms import PlaneForm
 
 def home(request):
-  return render(request, 'home.html')
+  watchlist = Plane.objects.all()
+  return render(request, 'home.html', { 'watchlist': watchlist })
 
 class PlaneCreate(CreateView):
   model = Plane
@@ -25,11 +26,12 @@ class PlaneDelete(DeleteView):
 def add_plane(request):
   # create a ModelForm instance using the data in the posted form
   print('hello')
-  print(request)
+  print(request.POST)
 
   form = PlaneForm(request.POST)
   # validate the data
   if form.is_valid():
     new_plane = form.save(commit=False)
+    print(new_plane)
     new_plane.save()
   return redirect('home')
