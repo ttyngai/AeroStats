@@ -105,14 +105,13 @@
         'pk.eyJ1Ijoic2R1cHJlZSIsImEiOiJja3hpNXoyNGw0dWUxMnBtdTQ5ZjI4MmZsIn0.19iQPPtrr4jFeqmOLEJ1BA',
     }
   ).addTo(map);
+  // Remove leftover shadow layer upon map creation
+  document.getElementsByClassName('leaflet-shadow-pane')[0].remove();
 
   // Draws marker on first load
   // updatePlaneMarkers();
-  // Remove leftover shadow
-  document.getElementsByClassName('leaflet-shadow-pane')[0].remove();
+
   map.on('moveend', async function () {
-    // Remove all plane markers before updating
-    document.getElementsByClassName('leaflet-marker-pane')[0].innerHTML = '';
     // call update plane marker function
     updatePlaneMarkers();
     // User's last viewed map location, stored in localStorage
@@ -129,12 +128,21 @@
     }, 10000);
   }
 
+  var planeMarker = L.icon({
+    iconUrl: 'static/images/plane_icon.png',
+    iconSize: [20, 20], // size of the icon
+    shadowSize: [0, 0], // size of the shadow
+    iconAnchor: [0, 0], // point of the icon which will correspond to marker's location
+    shadowAnchor: [0, 0], // the same for the shadow
+    popupAnchor: [0, -20], // point from which the popup should open relative to the iconAnchor
+  });
   // render planes in area
   async function updatePlaneMarkers() {
     // Remove all plane markers before updating
+
     document.getElementsByClassName('leaflet-marker-pane')[0].innerHTML = '';
-    L.Icon.Default.imagePath =
-      'https://www.clipartmax.com/png/full/333-3330249_113-origami-icons-plane-icon-outline-png.png';
+    // L.Icon.Default.imagePath =
+    //   'https://www.clipartmax.com/png/full/333-3330249_113-origami-icons-plane-icon-outline-png.png';
     let gotBounds = map.getBounds();
     await fetch(
       `https://opensky-network.org/api/states/all?lamin=${gotBounds._southWest.lat}&lomin=${gotBounds._southWest.lng}&lamax=${gotBounds._northEast.lat}&lomax=${gotBounds._northEast.lng}`
@@ -144,7 +152,7 @@
         if (data.states) {
           data.states.forEach(function (f) {
             if (f[1] && f[5] && f[6]) {
-              L.marker([f[6], f[5]])
+              L.marker([f[6], f[5]], { icon: planeMarker })
                 .addTo(map)
                 .bindPopup(
                   `<h5>Aircraft Details</h5><div>Place of Origin: ${f[2].toUpperCase()}</div><div>Callsign: ${f[1].toUpperCase()}</div><div>Transponder: ${f[0].toUpperCase()}</div><br><div>${
