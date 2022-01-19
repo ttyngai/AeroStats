@@ -94,7 +94,13 @@
   ], {
   }).addTo(map)
 
-  .bindPopup(`<a href="#" onclick="showWatchlist();">{{ flight.callsign }}</a>`);
+  .bindPopup(`  <form action="/planes/create/" method="post">
+    <!-- Django requires the following for security purposes -->
+    {% csrf_token %}
+    <input value="{{flight.callsign}}" type="hidden" name="callsign">
+    <input type="submit" value="Submit!" class="btn">
+
+  </form>`);
 
   // Assign rotational attribute
   document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].setAttribute('true_track', {{flight.true_track}});
