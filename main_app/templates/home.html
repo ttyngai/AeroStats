@@ -103,33 +103,6 @@
         'pk.eyJ1Ijoic2R1cHJlZSIsImEiOiJja3hpNXoyNGw0dWUxMnBtdTQ5ZjI4MmZsIn0.19iQPPtrr4jFeqmOLEJ1BA',
     }
   ).addTo(map);
-  // {% for flight in flight_data_parsed%}
-  // Add icon
-
-  // L.Icon.Default.imagePath = "static/images/plane_icon.png"
-
-  // L.marker([
-  // {{flight.latitude}},{{flight.longitude}},
-  // ], {
-  // }).addTo(map)
-
-  // .bindPopup(`  <form action="/planes/create/" method="post">
-  //   <!-- Django requires the following for security purposes -->
-  //   {% csrf_token %}
-  //   <input value="{{flight.callsign}}" type="hidden" name="callsign">
-  //   <input type="submit" value="Submit!" class="btn">
-
-  // </form>`);
-
-  // // Assign rotational attribute
-  // document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].setAttribute('true_track', {{flight.true_track}});
-
-  // // Rotate!
-  // document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].style.transform = `${document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].style.transform} rotate(${document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].getAttribute('true_track')}deg)`
-
-  // {% endfor %}
-
-  //Detects pan, provides new bounds, top right corner(north east) & bottom left corner(southWest)
 
   // Draws marker on first load
   updatePlaneMarkers();
@@ -154,23 +127,9 @@
     )
       .then((res) => res.json())
       .then((data) => {
-        // console.log(data.states)
         if (data.states) {
           data.states.forEach(function (f) {
-            // console.log(f)
-            // obj = {
-            //   'callsign': f[1],
-            //   'time_position': f[3],
-            //   'longitude': f[5],
-            //   'latitude': f[6],
-            //   'baro_altitude': f[7],
-            //   'on_ground': f[8],
-            //   'velocity': f[9],
-            //   'true_track': f[10],
-            //   'vertical_rate': f[11]
-            // }
             if (f[1] && f[5] && f[6] && !f[8]) {
-              // flightDataParsed.push(obj)
               L.marker([f[6], f[5]])
                 .addTo(map)
                 .bindPopup(
@@ -217,7 +176,6 @@
       document.getElementById('watchlist').classList.add('watchlist-hide');
     }
   }
-
   function showMenu() {
     document.getElementById('nav').classList.remove('nav-hide');
     document.getElementById('nav').classList.add('nav-show');
