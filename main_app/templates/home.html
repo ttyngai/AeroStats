@@ -154,6 +154,20 @@
         }
       });
   }
+
+  // test find plane example
+  findPlane('N168SU');
+  // call anyplane in the world with this callsign
+  async function findPlane(callsign) {
+    await fetch(`https://opensky-network.org/api/states/all`)
+      .then((res) => res.json())
+      .then((data) => {
+        let plane = data.states.find(function (p) {
+          return p[1].includes(callsign);
+        });
+        map.setView([plane[6], plane[5]]);
+      });
+  }
   // User's last viewed map location
   function getNewbounds() {
     localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
