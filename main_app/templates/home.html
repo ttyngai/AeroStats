@@ -129,7 +129,7 @@
       .then((data) => {
         if (data.states) {
           data.states.forEach(function (f) {
-            if (f[1] && f[5] && f[6] && !f[8]) {
+            if (f[1] && f[5] && f[6]) {
               L.marker([f[6], f[5]])
                 .addTo(map)
                 .bindPopup(
@@ -139,7 +139,7 @@
             <input type="submit" value="Submit!" class="btn">
             </form>`
                 );
-              // Add Rotate(true track)
+              // Add rotation
               document.getElementsByClassName('leaflet-marker-icon')[
                 document.getElementsByClassName('leaflet-marker-icon').length -
                   1
@@ -149,14 +149,58 @@
                     .length - 1
                 ].style.transform
               } rotate(${f[10]}deg)`;
+              // Add transform back to center Y axis
+              document.getElementsByClassName('leaflet-marker-icon')[
+                document.getElementsByClassName('leaflet-marker-icon').length -
+                  1
+              ].style.marginTop = `${
+                parseFloat(
+                  document
+                    .getElementsByClassName('leaflet-marker-icon')
+                    [
+                      document.getElementsByClassName('leaflet-marker-icon')
+                        .length - 1
+                    ].style.marginTop.substring(
+                      0,
+                      document
+                        .getElementsByClassName('leaflet-marker-icon')
+                        [
+                          document.getElementsByClassName('leaflet-marker-icon')
+                            .length - 1
+                        ].style.marginTop.indexOf('px')
+                    )
+                ) / 2
+              }px`;
+              // Add transform back to center X axis
+              document.getElementsByClassName('leaflet-marker-icon')[
+                document.getElementsByClassName('leaflet-marker-icon').length -
+                  1
+              ].style.marginLeft = `${
+                parseFloat(
+                  document
+                    .getElementsByClassName('leaflet-marker-icon')
+                    [
+                      document.getElementsByClassName('leaflet-marker-icon')
+                        .length - 1
+                    ].style.marginTop.substring(
+                      0,
+                      document
+                        .getElementsByClassName('leaflet-marker-icon')
+                        [
+                          document.getElementsByClassName('leaflet-marker-icon')
+                            .length - 1
+                        ].style.marginLeft.indexOf('px')
+                    )
+                ) / 2
+              }px`;
             }
           });
         }
       });
   }
 
-  // test find plane example
-  findPlane('N168SU');
+  // Test find plane example
+  // findPlane('N168SU');
   // call anyplane in the world with this callsign
   async function findPlane(callsign) {
     await fetch(`https://opensky-network.org/api/states/all`)
