@@ -22,7 +22,7 @@
   >
     <h1>Watchlist</h1>
     {%for plane in watchlist%}
-    <p>{{plane.callsign}}</p>
+    <p>{{plane.icao24}}<a href = "#" onclick="hideWatchlist(); findPlane('{{plane.icao24}}')">go</a></p>
     {%endfor%}
   </div>
 </watchlist>
@@ -167,7 +167,7 @@
                     2
                   )}°W</div><br><form action="/planes/create/" method="post">
             {% csrf_token %}
-            <input value="${f[1]}" type="hidden" name="callsign">
+            <input value="${f[0]}" type="hidden" name="icao24">
             <input type="submit" value="Add to Watchlist" class="btn">
             </form>`
                 );
@@ -269,7 +269,7 @@
                 2
               )}°W</div><br><form action="/planes/create/" method="post">
             {% csrf_token %}
-            <input value="${plane[1]}" type="hidden" name="callsign">
+            <input value="${plane[0]}" type="hidden" name="icao24">
             <input type="submit" value="Add to Watchlist" class="btn">
             </form>`
             )

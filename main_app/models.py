@@ -16,4 +16,4 @@ class Sighting(models.Model):
 
 class Plane(models.Model):
   icao24 = models.CharField(max_length = 8)
-
+  
