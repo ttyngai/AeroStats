@@ -54,6 +54,8 @@ def home(request):
 
 
 def home_update(request, latMax, latMin, longMax, longMin):
+  watchlist = Plane.objects.all()
+
   # need to get request from that refresh
 
   convert_lat_long(latMax)
@@ -92,7 +94,7 @@ def home_update(request, latMax, latMin, longMax, longMin):
   # for idx, flight in enumerate(closest_flights):
   #   print(idx, flight.distance_from_self)
   # slice list to take top 100(closest) flights
-  return render(request, 'home.html', {'flight_data_parsed': flight_data_parsed})
+  return render(request, 'home.html', {'flight_data_parsed': flight_data_parsed, "watchlist": watchlist})
 
 
 def convert_lat_long(coord):
