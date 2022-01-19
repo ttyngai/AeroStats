@@ -84,8 +84,10 @@
     latMin = newBounds._southWest.lat;
     longMax = newBounds._northEast.lng;
     longMin = newBounds._southWest.lng;
+  } else {
+    gotoMyLocation();
   }
-  gotoMyLocation();
+
   var map = L.map('map').fitBounds([
     [latMin, longMax],
     [latMax, longMin],
