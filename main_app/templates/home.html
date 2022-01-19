@@ -1,6 +1,10 @@
 {% extends 'base.html' %} {% block content %}
 <map onclick="hideWatchlist(); hideMenu();">
-  <div id="map" style="width: 100vw; height: 100vh; z-index: 0"></div>
+  <div
+    id="map"
+    style="width: 100vw; height: 100vh; z-index: 0"
+    tap="false"
+  ></div>
 </map>
 <watchlist>
   <div
