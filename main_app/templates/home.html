@@ -225,6 +225,16 @@
   // Test find plane example
   // findPlane('N168SU');
   // call anyplane in the world with this callsign or icao24(Transponder hex string)
+
+  // Automatic find plane and refresh
+  function autoRefreshFindPlane(icao24) {
+    findPlane(icao24);
+    setTimeout(function () {
+      autoRefreshFindPlane(icao24);
+    }, 10000);
+  }
+
+  // Find plane with given icao24
   async function findPlane(icao24) {
     await fetch(
       `https://opensky-network.org/api/states/all?icao24=${icao24.toLowerCase()}`
