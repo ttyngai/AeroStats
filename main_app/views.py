@@ -11,12 +11,12 @@ def home(request):
 
 class PlaneCreate(CreateView):
   model = Plane
-  fields = ['callsign']
+  fields = ['icao24']
   success_url = '/www.google.com'
 
 class PlaneUpdate(UpdateView):
   model = Plane
-  fields = ['callsign']
+  fields = ['icao24']
 
 class PlaneDelete(DeleteView):
   model = Plane
