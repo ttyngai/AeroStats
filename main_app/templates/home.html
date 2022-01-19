@@ -8,8 +8,9 @@
   height: 80vh;
   padding: 10vw; border: 1vh solid lightgray; border-radius: 5vh; position: absolute; top: 10vh; left: 10vh; z-index: 0; background-color: white; opacity: .8;">
     <h1>Watchlist</h1>
-    <a href="#">{{ flight.callsign }}tex ttext tex tex text</a>
-
+    {%for plane in watchlist%}
+    <p>{{plane.callsign}}</p>
+    {%endfor%}
   </div>
 </watchlist>
 <nav-container>
@@ -94,7 +95,13 @@
   ], {
   }).addTo(map)
 
-  .bindPopup(`<a href="#" onclick="showWatchlist();">{{ flight.callsign }}</a>`);
+  .bindPopup(`  <form action="/planes/create/" method="post">
+    <!-- Django requires the following for security purposes -->
+    {% csrf_token %}
+    <input value="{{flight.callsign}}" type="hidden" name="callsign">
+    <input type="submit" value="Submit!" class="btn">
+
+  </form>`);
 
   // Assign rotational attribute
   document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].setAttribute('true_track', {{flight.true_track}});
@@ -153,6 +160,7 @@
       document.getElementById('watchlist').classList.add('watchlist-hide');
     }
   }
+
   function showMenu() {
     document.getElementById('nav').classList.remove('nav-hide');
     document.getElementById('nav').classList.add('nav-show');
