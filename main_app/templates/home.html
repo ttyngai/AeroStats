@@ -213,16 +213,13 @@
   // Test find plane example
   // findPlane('N168SU');
   // call anyplane in the world with this callsign or icao24(Transponder hex string)
-  async function findPlane(callsign) {
-    await fetch(`https://opensky-network.org/api/states/all`)
+  async function findPlane(icao24) {
+    await fetch(
+      `https://opensky-network.org/api/states/all?icao24=${icao24.toLowerCase()}`
+    )
       .then((res) => res.json())
       .then((data) => {
-        let plane = data.states.find(function (p) {
-          return (
-            p[0].toUpperCase().includes(callsign.toUpperCase()) ||
-            p[1].toUpperCase().includes(callsign.toUpperCase())
-          );
-        });
+        let plane = data.states[0];
         if (plane) {
           map.setView([plane[6], plane[5]], 9);
           L.marker([plane[6], plane[5]])
@@ -246,7 +243,7 @@
             )
             .openPopup();
         } else {
-          console.log(`${callsign} Not Active`);
+          console.log(`${icao24} Not Active`);
         }
       });
   }
