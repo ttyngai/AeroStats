@@ -42,7 +42,7 @@
     "
   >
     <ul>
-      <li><a href="#!">one</a></li>
+      <li><a href="#!" onclick="showWatchlist(); hideMenu(); hideWatchlist();">Watchlist</a></li>
       <li><a href="#!">two</a></li>
       <li class="divider"></li>
       <li><a href="#!">three</a></li>
@@ -310,6 +310,8 @@
   function showMenu() {
     document.getElementById('nav').classList.remove('nav-hide');
     document.getElementById('nav').classList.add('nav-show');
+    document.getElementById('watchlist').classList.remove('watchlist-show');
+    document.getElementById('watchlist').classList.add('watchlist-hide');
   }
   function hideMenu() {
     document.getElementById('nav').classList.remove('nav-show');
