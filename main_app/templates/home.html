@@ -1,5 +1,5 @@
 {% extends 'base.html' %} {% block content %}
-<map onclick="hideWatchlist(); hideMenu();" tap="false">
+<map onclick="hideWatchlist(); hideMenu();">
   <div id="map" style="width: 100vw; height: 100vh; z-index: 0"></div>
 </map>
 <watchlist>
@@ -88,7 +88,7 @@
     gotoMyLocation();
   }
 
-  var map = L.map('map').fitBounds([
+  var map = L.map('map', { tap: false }).fitBounds([
     [latMin, longMax],
     [latMax, longMin],
   ]);
