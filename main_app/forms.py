@@ -4,4 +4,4 @@ from .models import Plane
 class PlaneForm(ModelForm):
   class Meta:
     model = Plane
-    fields = ['callsign']
+    fields = ['icao24']
