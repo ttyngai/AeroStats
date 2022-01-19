@@ -2,13 +2,13 @@ from fileinput import close
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from random import sample
 from django.shortcuts import render, redirect
-import json
-import math
+# import json
+# import math
 from .models import Plane
 from .forms import PlaneForm
 
 # Add the following import
-from django.http import HttpResponse
+# from django.http import HttpResponse
 # import requests
 
 # class Flight:
