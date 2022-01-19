@@ -107,22 +107,20 @@
   ).addTo(map);
 
   // Draws marker on first load
-  updatePlaneMarkers();
+  // updatePlaneMarkers();
   // Remove leftover shadow
   document.getElementsByClassName('leaflet-shadow-pane')[0].remove();
   map.on('moveend', async function () {
-    // Remove all plane markers before updating
-
-    // call upate plane marker function
+    // call update plane marker function
     updatePlaneMarkers();
     // User's last viewed map location, stored in localStorage
     getNewbounds();
   });
 
   // Auto update planes
-
   autoUpdate();
   function autoUpdate() {
+    document.getElementsByClassName('leaflet-marker-pane')[0].innerHTML = '';
     updatePlaneMarkers();
     setTimeout(function () {
       autoUpdate();
@@ -131,6 +129,7 @@
 
   // render planes in area
   async function updatePlaneMarkers() {
+    // Remove all plane markers before updating
     document.getElementsByClassName('leaflet-marker-pane')[0].innerHTML = '';
     L.Icon.Default.imagePath =
       'https://www.clipartmax.com/png/full/333-3330249_113-origami-icons-plane-icon-outline-png.png';
@@ -224,7 +223,7 @@
 
   // Test find plane example
   // findPlane('N168SU');
-  // call anyplane in the world with this callsign or icao24(Transponder hex string)
+  // call anyplane in the world with icao24(Transponder hex string)
 
   // Automatic find plane and refresh
   function autoRefreshFindPlane(icao24) {
