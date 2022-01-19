@@ -134,7 +134,7 @@
     shadowSize: [0, 0], // size of the shadow
     iconAnchor: [0, 0], // point of the icon which will correspond to marker's location
     shadowAnchor: [0, 0], // the same for the shadow
-    popupAnchor: [0, -20], // point from which the popup should open relative to the iconAnchor
+    popupAnchor: [-10, -30], // point from which the popup should open relative to the iconAnchor
   });
   // render planes in area
   async function updatePlaneMarkers() {
@@ -181,50 +181,50 @@
                     .length - 1
                 ].style.transform
               } rotate(${f[10]}deg)`;
-              // Add transform back to center Y axis
-              document.getElementsByClassName('leaflet-marker-icon')[
-                document.getElementsByClassName('leaflet-marker-icon').length -
-                  1
-              ].style.marginTop = `${
-                parseFloat(
-                  document
-                    .getElementsByClassName('leaflet-marker-icon')
-                    [
-                      document.getElementsByClassName('leaflet-marker-icon')
-                        .length - 1
-                    ].style.marginTop.substring(
-                      0,
-                      document
-                        .getElementsByClassName('leaflet-marker-icon')
-                        [
-                          document.getElementsByClassName('leaflet-marker-icon')
-                            .length - 1
-                        ].style.marginTop.indexOf('px')
-                    )
-                ) / 2
-              }px`;
-              // Add transform back to center X axis
-              document.getElementsByClassName('leaflet-marker-icon')[
-                document.getElementsByClassName('leaflet-marker-icon').length -
-                  1
-              ].style.marginLeft = `${
-                parseFloat(
-                  document
-                    .getElementsByClassName('leaflet-marker-icon')
-                    [
-                      document.getElementsByClassName('leaflet-marker-icon')
-                        .length - 1
-                    ].style.marginTop.substring(
-                      0,
-                      document
-                        .getElementsByClassName('leaflet-marker-icon')
-                        [
-                          document.getElementsByClassName('leaflet-marker-icon')
-                            .length - 1
-                        ].style.marginLeft.indexOf('px')
-                    )
-                ) / 2
-              }px`;
+              // // Add transform back to center Y axis
+              // document.getElementsByClassName('leaflet-marker-icon')[
+              //   document.getElementsByClassName('leaflet-marker-icon').length -
+              //     1
+              // ].style.marginTop = `${
+              //   parseFloat(
+              //     document
+              //       .getElementsByClassName('leaflet-marker-icon')
+              //       [
+              //         document.getElementsByClassName('leaflet-marker-icon')
+              //           .length - 1
+              //       ].style.marginTop.substring(
+              //         0,
+              //         document
+              //           .getElementsByClassName('leaflet-marker-icon')
+              //           [
+              //             document.getElementsByClassName('leaflet-marker-icon')
+              //               .length - 1
+              //           ].style.marginTop.indexOf('px')
+              //       )
+              //   ) / 2
+              // }px`;
+              // // Add transform back to center X axis
+              // document.getElementsByClassName('leaflet-marker-icon')[
+              //   document.getElementsByClassName('leaflet-marker-icon').length -
+              //     1
+              // ].style.marginLeft = `${
+              //   parseFloat(
+              //     document
+              //       .getElementsByClassName('leaflet-marker-icon')
+              //       [
+              //         document.getElementsByClassName('leaflet-marker-icon')
+              //           .length - 1
+              //       ].style.marginTop.substring(
+              //         0,
+              //         document
+              //           .getElementsByClassName('leaflet-marker-icon')
+              //           [
+              //             document.getElementsByClassName('leaflet-marker-icon')
+              //               .length - 1
+              //           ].style.marginLeft.indexOf('px')
+              //       )
+              //   ) / 2
+              // }px`;
             }
           });
         }
