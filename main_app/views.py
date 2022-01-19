@@ -1,12 +1,11 @@
 from fileinput import close
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from random import sample
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import json
 import math
 from .models import Plane
-
-
+from .forms import PlaneForm
 
 # Add the following import
 from django.http import HttpResponse
@@ -55,6 +54,8 @@ def home(request):
 
 
 def home_update(request, latMax, latMin, longMax, longMin):
+  watchlist = Plane.objects.all()
+
   # need to get request from that refresh
 
   convert_lat_long(latMax)
@@ -93,7 +94,7 @@ def home_update(request, latMax, latMin, longMax, longMin):
   # for idx, flight in enumerate(closest_flights):
   #   print(idx, flight.distance_from_self)
   # slice list to take top 100(closest) flights
-  return render(request, 'home.html', {'flight_data_parsed': flight_data_parsed})
+  return render(request, 'home.html', {'flight_data_parsed': flight_data_parsed, "watchlist": watchlist})
 
 
 def convert_lat_long(coord):
@@ -105,6 +106,7 @@ def convert_lat_long(coord):
 class PlaneCreate(CreateView):
   model = Plane
   fields = ['callsign']
+  success_url = '/www.google.com'
 
 class PlaneUpdate(UpdateView):
   model = Plane
@@ -113,3 +115,15 @@ class PlaneUpdate(UpdateView):
 class PlaneDelete(DeleteView):
   model = Plane
   success_url = '/planes/'
+
+def add_plane(request):
+  # create a ModelForm instance using the data in the posted form
+  print('hello')
+  print(request)
+
+  form = PlaneForm(request.POST)
+  # validate the data
+  if form.is_valid():
+    new_plane = form.save(commit=False)
+    new_plane.save()
+  return redirect('home')
