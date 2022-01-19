@@ -22,7 +22,7 @@
   >
     <h1>Watchlist</h1>
     {%for plane in watchlist%}
-    <p>{{plane.icao24}}<a href = "#" onclick="hideWatchlist(); findPlane('{{plane.icao24}}')">go</a></p>
+    <p>{{plane.callsign}}</p>
     {%endfor%}
   </div>
 </watchlist>
@@ -42,13 +42,45 @@
     "
   >
     <ul>
-      <li><a href="#!" onclick="showWatchlist(); hideMenu(); hideWatchlist();">Watchlist</a></li>
-      <li><a href="#!">two</a></li>
+      {% if user.is_authenticated %}
+      <li><a href="#" onclick="showWatchlist(); hideMenu(); hideWatchlist();">Watchlist</a></li>
+      <li><a href="#"></a></li>
       <li class="divider"></li>
-      <li><a href="#!">three</a></li>
-    </ul>
+      <li><a href="/accounts/logout/?next=/">Logout</a></li>
+      {% else %}
+      <li><a href="#" onclick="showLogin(); hideMenu()">Log In</a></li>
+      {% endif %}
+
+
   </div>
 </nav-container>
+<login>
+  <div
+    id="login"
+    class="login-hide"
+    style="
+      width: 90vw;
+      height: 80vh;
+      padding: 10vw;
+      border: 1vh solid lightgray;
+      border-radius: 5vh;
+      position: absolute;
+      top: 10vh;
+      left: 10vh;
+      z-index: 0;
+      background-color: white;
+      opacity: 0.8;
+    "
+  >
+    <h1>login</h1>
+    <form action="/accounts/login/" method="POST">
+      {% csrf_token %}
+      {{ login_form.as_p }}
+      <input type="submit" class="btn" value="Login">
+      <input type="hidden" name="next" value="/">
+    </form>
+  </div>
+</login>
 <menu-button>
   <div
     id="menu-button"
@@ -167,7 +199,7 @@
                     2
                   )}°W</div><br><form action="/planes/create/" method="post">
             {% csrf_token %}
-            <input value="${f[0]}" type="hidden" name="icao24">
+            <input value="${f[1]}" type="hidden" name="callsign">
             <input type="submit" value="Add to Watchlist" class="btn">
             </form>`
                 );
@@ -269,7 +301,7 @@
                 2
               )}°W</div><br><form action="/planes/create/" method="post">
             {% csrf_token %}
-            <input value="${plane[0]}" type="hidden" name="icao24">
+            <input value="${plane[1]}" type="hidden" name="callsign">
             <input type="submit" value="Add to Watchlist" class="btn">
             </form>`
             )
@@ -317,6 +349,16 @@
     document.getElementById('nav').classList.remove('nav-show');
     document.getElementById('nav').classList.add('nav-hide');
   }
+  function showLogin() {
+    document.getElementById('login').classList.remove('login-hide');
+    document.getElementById('login').classList.add('login-show');
+    document.getElementById('watchlist').classList.remove('watchlist-show');
+    document.getElementById('watchlist').classList.add('watchlist-hide');
+  }
+  function hideLogin() {
+    document.getElementById('login').classList.remove('login-show');
+    document.getElementById('login').classList.add('login-hide');
+  }  
 </script>
 
 {% endblock %}
