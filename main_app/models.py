@@ -15,5 +15,5 @@ class Sighting(models.Model):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class Plane(models.Model):
-  callsign = models.CharField(max_length = 8)
+  icao24 = models.CharField(max_length = 8)
 
