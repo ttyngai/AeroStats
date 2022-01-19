@@ -15,6 +15,13 @@
   display: none;
 }
 
+.login-show {
+  display: block;
+}
+
+.login-hide {
+  display: none;
+}
 
 .nav-show {
   display: block;
