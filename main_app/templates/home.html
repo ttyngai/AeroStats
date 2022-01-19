@@ -111,6 +111,8 @@
   // Remove leftover shadow
   document.getElementsByClassName('leaflet-shadow-pane')[0].remove();
   map.on('moveend', async function () {
+    // Remove all plane markers before updating
+    document.getElementsByClassName('leaflet-marker-pane')[0].innerHTML = '';
     // call update plane marker function
     updatePlaneMarkers();
     // User's last viewed map location, stored in localStorage
@@ -146,7 +148,7 @@
                 .addTo(map)
                 .bindPopup(
                   `<h5>Aircraft Details</h5><div>Place of Origin: ${f[2].toUpperCase()}</div><div>Callsign: ${f[1].toUpperCase()}</div><div>Transponder: ${f[0].toUpperCase()}</div><br><div>${
-                    f[8] ? 'Aircraft Grounded' : `Airborne at ${f[7]} m `
+                    f[8] ? 'Aircraft Grounded' : `Airborne: ${f[7]} m `
                   }</div><div>Airspeed: ${f[9]} m/s</div><div>Bearing: ${
                     f[10]
                   }°N</div><div>${
@@ -248,7 +250,7 @@
             .addTo(map)
             .bindPopup(
               `<h5>Aircraft Details</h5><div>Place of Origin: ${plane[2].toUpperCase()}</div><div>Callsign: ${plane[1].toUpperCase()}</div><div>Transponder: ${plane[0].toUpperCase()}</div><br><div>${
-                plane[8] ? 'Aircraft Grounded' : `Airborne at ${plane[7]} m `
+                plane[8] ? 'Aircraft Grounded' : `Airborne: ${plane[7]} m `
               }</div><div>Airspeed: ${plane[9]} m/s</div><div>Bearing: ${
                 plane[10]
               }°N</div><div>${
