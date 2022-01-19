@@ -23,7 +23,7 @@ class PlaneUpdate(UpdateView):
 
 class PlaneDelete(DeleteView):
   model = Plane
-  success_url = '/planes/'
+  success_url = '/'
 
 def add_plane(request):
   # create a ModelForm instance using the data in the posted form
