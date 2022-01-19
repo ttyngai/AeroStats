@@ -70,164 +70,165 @@
   </div>
 </menu-button>
 <script>
-  // Shane's default bounds, need to find how to get self location + bounds
-  let latMax = 44;
-  let latMin = 43;
-  let longMax = -73;
-  let longMin = -74;
-  // If scrolled previously, bounds would be saved in localStorage.bounds
-  let newBounds;
-  if (localStorage.aeroStatsBounds) {
-    console.log(localStorage.aeroStatsBounds);
-    newBounds = JSON.parse(localStorage.aeroStatsBounds);
-    latMax = newBounds._northEast.lat;
-    latMin = newBounds._southWest.lat;
-    longMax = newBounds._northEast.lng;
-    longMin = newBounds._southWest.lng;
-  }
-  // Plug in planes here using flight data
-  //   const f = {{closest_flights}};
-  //   console.log(f);
+      // Shane's default bounds, need to find how to get self location + bounds
+      let latMax = 44;
+      let latMin = 43;
+      let longMax = -73;
+      let longMin = -74;
+      // If scrolled previously, bounds would be saved in localStorage.bounds
+      let newBounds;
+      if (localStorage.aeroStatsBounds) {
+        console.log(localStorage.aeroStatsBounds);
+        newBounds = JSON.parse(localStorage.aeroStatsBounds);
+        latMax = newBounds._northEast.lat;
+        latMin = newBounds._southWest.lat;
+        longMax = newBounds._northEast.lng;
+        longMin = newBounds._southWest.lng;
+      }
+      // Plug in planes here using flight data
+      //   const f = {{closest_flights}};
+      //   console.log(f);
 
-  // Plug in planes end
-  var map = L.map('map').fitBounds([
-    [latMin, longMax],
-    [latMax, longMin],
-  ]);
-  L.tileLayer(
-    'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
-    {
-      attribution:
-        'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-      maxZoom: 18,
-      id: 'mapbox/streets-v11',
-      tileSize: 512,
-      zoomOffset: -1,
-      accessToken:
-        'pk.eyJ1Ijoic2R1cHJlZSIsImEiOiJja3hpNXoyNGw0dWUxMnBtdTQ5ZjI4MmZsIn0.19iQPPtrr4jFeqmOLEJ1BA',
-    }
-  ).addTo(map);
-  {% for flight in flight_data_parsed%}
-  // Add icon
+      // Plug in planes end
+      var map = L.map('map').fitBounds([
+        [latMin, longMax],
+        [latMax, longMin],
+      ]);
+      L.tileLayer(
+        'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
+        {
+          attribution:
+            'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+          maxZoom: 18,
+          id: 'mapbox/streets-v11',
+          tileSize: 512,
+          zoomOffset: -1,
+          accessToken:
+            'pk.eyJ1Ijoic2R1cHJlZSIsImEiOiJja3hpNXoyNGw0dWUxMnBtdTQ5ZjI4MmZsIn0.19iQPPtrr4jFeqmOLEJ1BA',
+        }
+      ).addTo(map);
+      {% for flight in flight_data_parsed%}
+      // Add icon
 
-  L.Icon.Default.imagePath = "https://www.clipartmax.com/png/full/333-3330249_113-origami-icons-plane-icon-outline-png.png"
-  // L.Icon.Default.imagePath = "static/images/plane_icon.png"
+      L.Icon.Default.imagePath = "https://www.clipartmax.com/png/full/333-3330249_113-origami-icons-plane-icon-outline-png.png"
+      // L.Icon.Default.imagePath = "static/images/plane_icon.png"
 
-  L.marker([
-  {{flight.latitude}},{{flight.longitude}},
-  ], {
-  }).addTo(map)
+      L.marker([
+      {{flight.latitude}},{{flight.longitude}},
+      ], {
+      }).addTo(map)
 
-  .bindPopup(`  <form action="/planes/create/" method="post">
-    <!-- Django requires the following for security purposes -->
-    {% csrf_token %}
-    <input value="{{flight.callsign}}" type="hidden" name="callsign">
-    <input type="submit" value="Submit!" class="btn">
+      .bindPopup(`  <form action="/planes/create/" method="post">
+        <!-- Django requires the following for security purposes -->
+        {% csrf_token %}
+        <input value="{{flight.callsign}}" type="hidden" name="callsign">
+        <input type="submit" value="Submit!" class="btn">
 
-  </form>`);
+      </form>`);
 
-  // Assign rotational attribute
-  document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].setAttribute('true_track', {{flight.true_track}});
+      // Assign rotational attribute
+      document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].setAttribute('true_track', {{flight.true_track}});
+
+      // Rotate!
+      document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].style.transform = `${document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].style.transform} rotate(${document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].getAttribute('true_track')}deg)`
+
+      {% endfor %}
+    // Remove leftover shadow
+      document.getElementsByClassName('leaflet-shadow-pane')[0].remove()
+      //Detects pan, provides new bounds, top right corner(north east) & bottom left corner(southWest)
+      map.on('moveend', async function () {
+        // remove all planes before updating
+        document.getElementsByClassName('leaflet-marker-pane')[0].innerHTML = ""
+
+
+        updatePlaneMarkers()
+
+        // let gotBounds = fastGetBounds();
+        // // refresh right after scrolling, carrying bounds data
+        // let latMinId = gotBounds._northEast.lat
+        // latMinId = latLongSign(latMinId)
+        // let latMaxId = gotBounds._southWest.lat
+        // latMaxId = latLongSign(latMaxId)
+        // let longMinId = gotBounds._northEast.lng
+        // longMinId = latLongSign(longMinId)
+        // let longMaxId = gotBounds._southWest.lng
+        // longMaxId = latLongSign(longMaxId)
+        // window.location.href = `/update/${latMinId}/${latMaxId}/${longMinId}/${longMaxId}/`;
+      });
+      // Makes for smoother scroll right up till refresh
+      // function fastGetBounds() {
+      //   localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
+      //   return map.getBounds();
+      //   setTimeout(function () {
+      //     fastGetBounds();
+      //   }, 10);
+      // }
+      async function updatePlaneMarkers(){
+
+        let gotBounds = map.getBounds();
+        let flightDataParsed = []
+        await fetch(`https://opensky-network.org/api/states/all?lamin=${gotBounds._southWest.lat}&lomin=${gotBounds._southWest.lng}&lamax=${gotBounds._northEast.lat}&lomax=${gotBounds._northEast.lng}`).then((res) => res.json()).then(data => {
+          // console.log(data.states)
+          if (data.states){
+          data.states.forEach(function(f){
+            // console.log(f)
+            obj = {
+              'callsign': f[1],
+              'time_position': f[3],
+              'longitude': f[5],
+              'latitude': f[6],
+              'baro_altitude': f[7],
+              'on_ground': f[8],
+              'velocity': f[9],
+              'true_track': f[10],
+              'vertical_rate': f[11]
+            }
+            if (f[1] && f[5] && f[6] && !f[8]){
+              flightDataParsed.push(obj)
+
+              L.marker([f[6],f[5]]).addTo(map)
+              document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].setAttribute('true_track', f[10]);
 
   // Rotate!
-  document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].style.transform = `${document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].style.transform} rotate(${document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].getAttribute('true_track')}deg)`
+  document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].style.transform = `${document.getElementsByClassName('leaflet-marker-icon')[document.getElementsByClassName('leaflet-marker-icon').length-1].style.transform} rotate(${f[10]}deg)`
+            }
+          })
 
-  {% endfor %}
-   // Remove leftover shadow
-  document.getElementsByClassName('leaflet-shadow-pane')[0].remove()
-
-  //Detects pan, provides new bounds, top right corner(north east) & bottom left corner(southWest)
-  map.on('moveend', async function () {
-    // localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
-    document.getElementsByClassName('leaflet-marker-pane')[0].innerHTML = ""
-    updatePlaneMarkers()
-
-    // let gotBounds = fastGetBounds();
-    // // refresh right after scrolling, carrying bounds data
-    // let latMinId = gotBounds._northEast.lat
-    // latMinId = latLongSign(latMinId)
-    // let latMaxId = gotBounds._southWest.lat
-    // latMaxId = latLongSign(latMaxId)
-    // let longMinId = gotBounds._northEast.lng
-    // longMinId = latLongSign(longMinId)
-    // let longMaxId = gotBounds._southWest.lng
-    // longMaxId = latLongSign(longMaxId)
-    // window.location.href = `/update/${latMinId}/${latMaxId}/${longMinId}/${longMaxId}/`;
-  });
-  // Makes for smoother scroll right up till refresh
-  // function fastGetBounds() {
-  //   localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
-  //   return map.getBounds();
-  //   setTimeout(function () {
-  //     fastGetBounds();
-  //   }, 10);
-  // }
-  async function updatePlaneMarkers(){
-
-    let gotBounds = map.getBounds();
-    let flightDataParsed = []
-    await fetch(`https://opensky-network.org/api/states/all?lamin=${gotBounds._southWest.lat}&lomin=${gotBounds._southWest.lng}&lamax=${gotBounds._northEast.lat}&lomax=${gotBounds._northEast.lng}`).then((res) => res.json()).then(data => {
-      // console.log(data.states)
-      if (data.states){
-      data.states.forEach(function(f){
-        // console.log(f)
-        obj = {
-          'callsign': f[1],
-          'time_position': f[3],
-          'longitude': f[5],
-          'latitude': f[6],
-          'baro_altitude': f[7],
-          'on_ground': f[8],
-          'velocity': f[9],
-          'true_track': f[10],
-          'vertical_rate': f[11]
-        }
-        if (f[1] && f[5] && f[6] && !f[8]){
-          flightDataParsed.push(obj)
-
-          L.marker([f[6],f[5]]).addTo(map)
-        }
-      })
-
-
-
-
-      console.log(flightDataParsed)
+          }
+        })
       }
-    })
-  }
 
-  // function latLongSign(coord){
-  //   if (coord>0){
-  //       return 'p'+coord*10000000000000000
-  //   } else {
-  //       return 'n'+coord*-10000000000000000
-  //   }
-  // }
+      // function latLongSign(coord){
+      //   if (coord>0){
+      //       return 'p'+coord*10000000000000000
+      //   } else {
+      //       return 'n'+coord*-10000000000000000
+      //   }
+      // }
 
-  function showWatchlist() {
-    document.getElementById('watchlist').classList.remove('watchlist-hide');
-    document.getElementById('watchlist').classList.add('watchlist-unhide');
-  }
-  function hideWatchlist() {
-    if(document.getElementById('watchlist').classList.contains('watchlist-unhide')) {
-      document.getElementById('watchlist').classList.remove('watchlist-unhide');
-      document.getElementById('watchlist').classList.add('watchlist-show');
-    } else {
-      document.getElementById('watchlist').classList.remove('watchlist-show');
-      document.getElementById('watchlist').classList.add('watchlist-hide');
-    }
-  }
+      function showWatchlist() {
+        document.getElementById('watchlist').classList.remove('watchlist-hide');
+        document.getElementById('watchlist').classList.add('watchlist-unhide');
+      }
+      function hideWatchlist() {
+        if(document.getElementById('watchlist').classList.contains('watchlist-unhide')) {
+          document.getElementById('watchlist').classList.remove('watchlist-unhide');
+          document.getElementById('watchlist').classList.add('watchlist-show');
+        } else {
+          document.getElementById('watchlist').classList.remove('watchlist-show');
+          document.getElementById('watchlist').classList.add('watchlist-hide');
+        }
+      }
 
-  function showMenu() {
-    document.getElementById('nav').classList.remove('nav-hide');
-    document.getElementById('nav').classList.add('nav-show');
-  }
-  function hideMenu() {
+      function showMenu() {
+        document.getElementById('nav').classList.remove('nav-hide');
+        document.getElementById('nav').classList.add('nav-show');
+      }
+      function hideMenu() {
 
-    document.getElementById('nav').classList.remove('nav-show');
-    document.getElementById('nav').classList.add('nav-hide');
-  }
+        document.getElementById('nav').classList.remove('nav-show');
+        document.getElementById('nav').classList.add('nav-hide');
+      }
 </script>
 
 {% endblock %}
