@@ -140,9 +140,11 @@
                     f[10]
                   }°N</div><div>${
                     f[11] < 0 ? 'Descending' : 'Ascending'
-                  } at ${Math.abs(
-                    f[11]
-                  )} m/s</div><br><form action="/planes/create/" method="post">
+                  } at ${Math.abs(f[11])} m/s</div><div>Lat: ${f[6].toFixed(
+                    2
+                  )}°N Long: ${f[5].toFixed(
+                    2
+                  )}°W</div><br><form action="/planes/create/" method="post">
             {% csrf_token %}
             <input value="${f[1]}" type="hidden" name="callsign">
             <input type="submit" value="Add to Watchlist" class="btn">
@@ -232,9 +234,11 @@
                 plane[10]
               }°N</div><div>${
                 plane[11] < 0 ? 'Descending' : 'Ascending'
-              } at ${Math.abs(
-                plane[11]
-              )} m/s</div><br><form action="/planes/create/" method="post">
+              } at ${Math.abs(plane[11])} m/s</div><div>Lat: ${plane[6].toFixed(
+                2
+              )}°N Long: ${plane[5].toFixed(
+                2
+              )}°W</div><br><form action="/planes/create/" method="post">
             {% csrf_token %}
             <input value="${plane[1]}" type="hidden" name="callsign">
             <input type="submit" value="Add to Watchlist" class="btn">
