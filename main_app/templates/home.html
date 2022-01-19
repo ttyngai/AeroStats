@@ -112,14 +112,26 @@
   document.getElementsByClassName('leaflet-shadow-pane')[0].remove();
   map.on('moveend', async function () {
     // Remove all plane markers before updating
-    document.getElementsByClassName('leaflet-marker-pane')[0].innerHTML = '';
+
     // call upate plane marker function
     updatePlaneMarkers();
     // User's last viewed map location, stored in localStorage
     getNewbounds();
   });
 
+  // Auto update planes
+
+  autoUpdate();
+  function autoUpdate() {
+    updatePlaneMarkers();
+    setTimeout(function () {
+      autoUpdate();
+    }, 10000);
+  }
+
+  // render planes in area
   async function updatePlaneMarkers() {
+    document.getElementsByClassName('leaflet-marker-pane')[0].innerHTML = '';
     L.Icon.Default.imagePath =
       'https://www.clipartmax.com/png/full/333-3330249_113-origami-icons-plane-icon-outline-png.png';
     let gotBounds = map.getBounds();
