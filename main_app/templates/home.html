@@ -223,6 +223,24 @@
         });
         if (plane) {
           map.setView([plane[6], plane[5]], 9);
+          L.marker([plane[6], plane[5]])
+            .addTo(map)
+            .bindPopup(
+              `<h5>Aircraft Details</h5><div>Place of Origin: ${plane[2].toUpperCase()}</div><div>Callsign: ${plane[1].toUpperCase()}</div><div>Transponder: ${plane[0].toUpperCase()}</div><br><div>${
+                plane[8] ? 'Aircraft Grounded' : `Airborne at ${plane[7]} m `
+              }</div><div>Airspeed: ${plane[9]} m/s</div><div>Bearing: ${
+                plane[10]
+              }°N</div><div>${
+                plane[11] < 0 ? 'Descending' : 'Ascending'
+              } at ${Math.abs(
+                plane[11]
+              )} m/s</div><br><form action="/planes/create/" method="post">
+            {% csrf_token %}
+            <input value="${plane[1]}" type="hidden" name="callsign">
+            <input type="submit" value="Add to Watchlist" class="btn">
+            </form>`
+            )
+            .openPopup();
         } else {
           console.log(`${callsign} Not Active`);
         }
