@@ -133,10 +133,16 @@
               L.marker([f[6], f[5]])
                 .addTo(map)
                 .bindPopup(
-                  `<form action="/planes/create/" method="post">
+                  `<p>Callsign: ${f[1]}</p><p>Origin: ${f[2]}</p><p>${
+                    f[8] ? 'Landed' : `Airborne at ${f[7]} m `
+                  }</p><p>Airspeed: ${f[9]} m/s at ${f[10]}° N</p><p>${
+                    f[11] < 0 ? 'Descending' : 'Ascending'
+                  } at ${Math.abs(
+                    f[11]
+                  )} m/s</p><form action="/planes/create/" method="post">
             {% csrf_token %}
             <input value="${f[1]}" type="hidden" name="callsign">
-            <input type="submit" value="Submit!" class="btn">
+            <input type="submit" value="Add to Watchlist" class="btn">
             </form>`
                 );
               // Add rotation
