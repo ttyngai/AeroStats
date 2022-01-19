@@ -85,7 +85,7 @@
     longMax = newBounds._northEast.lng;
     longMin = newBounds._southWest.lng;
   }
-
+  gotoMyLocation();
   var map = L.map('map').fitBounds([
     [latMin, longMax],
     [latMax, longMin],
@@ -109,7 +109,7 @@
   // Remove leftover shadow
   document.getElementsByClassName('leaflet-shadow-pane')[0].remove();
   map.on('moveend', async function () {
-    // remove all planes before updating
+    // Remove all plane markers before updating
     document.getElementsByClassName('leaflet-marker-pane')[0].innerHTML = '';
     // call upate plane marker function
     updatePlaneMarkers();
@@ -121,7 +121,6 @@
     L.Icon.Default.imagePath =
       'https://www.clipartmax.com/png/full/333-3330249_113-origami-icons-plane-icon-outline-png.png';
     let gotBounds = map.getBounds();
-    // let flightDataParsed = []
     await fetch(
       `https://opensky-network.org/api/states/all?lamin=${gotBounds._southWest.lat}&lomin=${gotBounds._southWest.lng}&lamax=${gotBounds._northEast.lat}&lomax=${gotBounds._northEast.lng}`
     )
@@ -215,14 +214,23 @@
       .then((res) => res.json())
       .then((data) => {
         let plane = data.states.find(function (p) {
-          return p[0].includes(callsign) || p[1].includes(callsign);
+          return (
+            p[0].toUpperCase().includes(callsign.toUpperCase()) ||
+            p[1].toUpperCase().includes(callsign.toUpperCase())
+          );
         });
         if (plane) {
-          map.setView([plane[6], plane[5]]);
+          map.setView([plane[6], plane[5]], 9);
         } else {
-          console.log(`${callsign} Not Found`);
+          console.log(`${callsign} Not Online`);
         }
       });
+  }
+
+  async function gotoMyLocation() {
+    navigator.geolocation.getCurrentPosition((position) => {
+      map.setView([position.coords.latitude, position.coords.longitude], 9);
+    });
   }
   // User's last viewed map location
   function getNewbounds() {
