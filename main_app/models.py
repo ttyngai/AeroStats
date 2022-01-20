@@ -18,6 +18,6 @@ class Sighting(models.Model):
 class Plane(models.Model):
   icao24 = models.CharField(max_length = 8)
 
-  def get_absolute_url(self):
-    return reverse('detail', kwargs={'plane_id': self.id})
+  # def get_absolute_url(self):
+  #   return reverse('detail', kwargs={'plane_id': self.id})
   
