@@ -7,34 +7,70 @@
     id="watchlist"
     class="watchlist-hide watchlist-style"
   >
+  <button onclick="hideWatchlist()" class='btn close-watchlist-button'>X</button>
     <h3>Aircraft Watchlist</h3>
-    {%for plane in watchlist%}
-    
     <table>
-      <thead>
+      <thead >
         <tr>
+
             <th>Transponder</th>
             <th>Callsign</th>
             <th>Origin</th>
+            <th>Velocity</th>
+            <th>Altitude</th>
             <th></th>
             <th></th>
         </tr>
       </thead>
-      <tbody>
-    <p></p>
-
-
-      
     </div>
-
+    <tbody >
+    {% for plane_detail in watchlist_populated%}
         <tr>
-          <td>{{plane.icao24}}</td>
-          <td>Eclair</td>
-          <td>$0.87</td>
-          <td><a class="btn" href = "#" onclick="hideWatchlist(); findPlane('{{plane.icao24}}')">Find</a></td>
-          <td><a class="btn btn-delete" href="{% url 'planes_delete' plane.id %}">X</a></td>
-        </tr>
+          {%if plane_detail.callsign != 'n/a'%}
+          <td>{{plane_detail.icao24|upper}}</td>
 
+          <td>{{plane_detail.origin_country}}</td>
+          <td>{{plane_detail.velocity}} m/s</td>
+
+
+          {%if plane_detail.altitude %}
+          <td>{{plane_detail.altitude}} m</td>
+          {%else%}
+          <td>Grounded</td>
+          {%endif%}
+
+
+          {%else%}
+          
+          <td>{{plane_detail.icao24}}</td>
+
+          <td>n/a</td>
+          <td>n/a</td>
+          <td>n/a</td>
+
+
+
+
+          {%endif%}
+
+
+
+
+
+
+
+
+          {%if plane_detail.callsign != 'n/a'%}
+          <td><a class="btn" href = "#" onclick="hideWatchlist(); findPlane('{{plane_detail.icao24}}')">Locate</a></td>
+          {% else %}
+          <td><a class="btn" disabled href = "#" onclick="hideWatchlist(); findPlane('{{plane_detail.icao24}}')">Offline</a></td>
+          {% endif%}
+          {%for plane in watchlist%}
+          {% if plane_detail.icao24 == plane.icao24 %}
+          <td><a class="btn btn-delete" href="{% url 'planes_delete' plane.id %}">X</a></td>
+          {%endif%}
+          {%endfor%}
+        </tr>
         {%endfor%}
       </tbody>
     </table>
@@ -220,6 +256,7 @@ class="menu-style"
 
   // Find plane with given icao24
   async function findPlane(icao24) {
+    document.getElementsByClassName('leaflet-marker-pane')[0].innerHTML = '';
     await fetch(
       `https://opensky-network.org/api/states/all?icao24=${icao24.toLowerCase()}`
     )
@@ -242,17 +279,15 @@ class="menu-style"
                 2
               )}°N Long: ${plane[5].toFixed(
                 2
-              )}°W</div><br><form action="/planes/create/" method="post">
-            {% csrf_token %}
-            <input value="${plane[0]}" type="hidden" name="icao24">
-            <input type="submit" value="Add to Watchlist" class="btn">
-            </form>`
+              )}°W</div><br>`
             )
             .openPopup();
         } else {
           console.log(`${icao24} Not Active`);
         }
       });
+      
+    updatePlaneMarkers();
   }
 
   async function gotoMyLocation() {
