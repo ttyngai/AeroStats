@@ -224,8 +224,8 @@
                   Create new passenger and add:
                   <form action="/passengers/create/" method="post">
                     {% csrf_token %}
-                    <input type="text" name="passenger" placeholder="Passenger name...">
-                    <input value="${f[0]}" type="hidden" name="plane_id">
+                    <input type="text" name="name" maxlength="50" required id="id_name" placeholder="Passenger name...">
+                    <input value="${f[0]}" type="hidden" name="icao24">
                     <input type="submit" value="Create Passenger" class="btn">
                   </form>
                 </div>
