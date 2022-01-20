@@ -241,8 +241,9 @@
                     {% for comment in comments %}
                       {%if user.is_authenticated%}
                       <li><span onclick="editComment({{comment.id}})" id="commentContent{{comment.id}}">{{comment.content}}</span></li>
-                      {% endif %}
+                      {% else %}
                       <li>{{ comment.content }}</li>
+                      {% endif %}
                     {% endfor %}
                   </ul>
                 {% else %}
