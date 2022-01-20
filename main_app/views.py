@@ -70,6 +70,7 @@ def home(request):
     'login_form': login_form,
     'watchlist_populated': watchlist,
     'passengers': passengers,
+    'plane': plane
   })
 
 

@@ -5,10 +5,7 @@
 </map>
 <!-- Menu Button -->
 <nav-container>
-  <div
-    id="nav"
-    class="nav-hide nav-container"
-  >
+  <div id="nav" class="nav-hide nav-container">
     <ul class="nav-content">
       {% if user.is_authenticated %}
         <li><a href="#" class="btn nav-button" onclick="showWatchlist(); hideMenu(); hideWatchlist(); menuUnclickedColor()">Watchlist</a></li>
@@ -175,10 +172,12 @@
       .then((data) => {
         if (data.states) {
           data.states.forEach(function (f) {
+            watchlist = [];
+            {% for plane in watchlist %}
+              watchlist.push('{{plane.icao24}}');
+            {% endfor %}
             if (f[1] && f[5] && f[6]) {
-              L.marker([f[6], f[5]], { icon: planeMarker })
-                .addTo(map)
-                .bindPopup(`
+              popupText = `
                 <h5>Aircraft Details</h5>
                 <div>Place of Origin: ${f[2].toUpperCase()}</div>
                 <div>Callsign: ${f[1].toUpperCase()}</div>
@@ -194,11 +193,17 @@
                 <div>${f[11] < 0 ? 'Descending' : 'Ascending'} at ${Math.abs(f[11])} m/s</div>
                 <div>Lat: ${f[6].toFixed(2)}°N Long: ${f[5].toFixed(2)}°W</div>
                 <br>
+              `;
+              if(! watchlist.includes(f[0])) {
+                popupText += `
                 <form action="/planes/create/" method="post">
                   {% csrf_token %}
                   <input value="${f[0]}" type="hidden" name="icao24">
                   <input type="submit" onclick="localStorage.openWatchlist=true;" value="Add to Watchlist" class="btn">
                 </form>
+                `;
+              } else {
+                popupText += `
                 <div>
                   <h5>Passengers:</h5>
                   {% if passengers %}
@@ -220,11 +225,16 @@
                   <form action="/passengers/create/" method="post">
                     {% csrf_token %}
                     <input type="text" name="passenger" placeholder="Passenger name...">
-                    <input value="{{plane.id}}" type="hidden" name="plane_id">
+                    <input value="${f[0]}" type="hidden" name="plane_id">
                     <input type="submit" value="Create Passenger" class="btn">
                   </form>
                 </div>
-                `);
+                `;
+              }
+
+              L.marker([f[6], f[5]], { icon: planeMarker })
+                .addTo(map)
+                .bindPopup(popupText);
               // Add rotation
               document.getElementsByClassName('leaflet-marker-icon')[
                 document.getElementsByClassName('leaflet-marker-icon').length -
