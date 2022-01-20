@@ -5,12 +5,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Plane
-from .forms import PlaneForm
+from .models import Plane, Passenger
+from .forms import PlaneForm, PassengerForm
 import requests
 
 def home(request):
-  print("Request.user: ", request.user)
   if(request.user.is_authenticated):
     watch_db = Plane.objects.filter(user = request.user)
   else:
@@ -18,9 +17,9 @@ def home(request):
 
   watchlist=[]
   login_form = AuthenticationForm()
+  passengers = Passenger.objects.all()
+
   if (watch_db and len(watch_db) != 0):
-    print('1')
-    print('1',watch_db)
     query_url = f'https://opensky-network.org/api/states/all?icao24={watch_db[0].icao24}'
     
     for idx, plane in enumerate(watch_db):
@@ -66,7 +65,12 @@ def home(request):
           'vertical_rate': 'n/a',
           }
         watchlist.append(f)
-  return render(request, 'home.html', { 'watchlist': watch_db, 'login_form': login_form ,'watchlist_populated': watchlist}, )
+  return render(request, 'home.html', {
+    'watchlist': watch_db,
+    'login_form': login_form,
+    'watchlist_populated': watchlist,
+    'passengers': passengers,
+  })
 
 
 # class PlaneCreate(LoginRequiredMixin, CreateView):
@@ -106,3 +110,34 @@ def planes_detail(request, plane_id):
   return render(request, 'planes/detail.html', {
     'plane': plane
   })
+
+@login_required
+def assoc_passenger(request, plane_id):
+  Plane.objects.get(id=plane_id).passengers.add(request.POST['passenger_id'])
+  # Well this is a poor user experiennce...
+  return redirect('home')
+
+@login_required
+def create_passenger(request):
+  print("Hello.")
+  print(request.POST)
+  plane = Plane.objects.get(id=request.POST['plane_id'])
+  print(plane.passengers)
+  form = PassengerForm(request.POST)
+  form.instance.user = request.user  # Add logged in user to form.
+  if form.is_valid():
+    new_passenger = form.save(commit=False)
+    new_passenger.save()
+    Plane.objects.get(id=plane.id).passengers.add(new_passenger.id)
+  return redirect('home')
+
+class PassengerCreate(LoginRequiredMixin, CreateView):
+  model = Passenger
+  fields = '__all__'
+
+class PassengerUpdate(LoginRequiredMixin, UpdateView):
+  model = Passenger
+  fields = ['name']
+
+class PassengerDelete(LoginRequiredMixin, DeleteView):
+  model = Passenger
