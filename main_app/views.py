@@ -3,15 +3,22 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from random import sample
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Plane
 from .forms import PlaneForm
 import requests
 
 def home(request):
-  watch_db = Plane.objects.all()
+  print("Request.user: ", request.user)
+  if(request.user.is_authenticated):
+    watch_db = Plane.objects.filter(user = request.user)
+  else:
+    watch_db = None
+
   watchlist=[]
   login_form = AuthenticationForm()
-  if (len(watch_db) != 0):
+  if (watch_db and len(watch_db) != 0):
     print('1')
     print('1',watch_db)
     query_url = f'https://opensky-network.org/api/states/all?icao24={watch_db[0].icao24}'
@@ -62,30 +69,32 @@ def home(request):
   return render(request, 'home.html', { 'watchlist': watch_db, 'login_form': login_form ,'watchlist_populated': watchlist}, )
 
 
-class PlaneCreate(CreateView):
+# class PlaneCreate(LoginRequiredMixin, CreateView):
+#   model = Plane
+#   fields = ['icao24']
+#   def form_valid(self, form):
+#     form.instance.user = self.request.user  # Add logged in user to form.
+#     return super().form_valid(form)
+
+class PlaneUpdate(LoginRequiredMixin, UpdateView):
   model = Plane
   fields = ['icao24']
-  success_url = '/www.google.com'
 
-class PlaneUpdate(UpdateView):
-  model = Plane
-  fields = ['icao24']
-
-class PlaneDelete(DeleteView):
+class PlaneDelete(LoginRequiredMixin, DeleteView):
   model = Plane
   success_url = '/'
 
+@login_required
 def add_plane(request):
   # create a ModelForm instance using the data in the posted form
-  planes = Plane.objects.all()
+  planes = Plane.objects.filter(user = request.user)
   already_in_db = False
   for plane in planes:
     if plane.icao24 == request.POST['icao24']:
-      print('Exists, Not adding')
       already_in_db = True
   if already_in_db == False:
-    print('New, Adding')
     form = PlaneForm(request.POST)
+    form.instance.user = request.user  # Add logged in user to form.
     # validate the data
     if form.is_valid():
       new_plane = form.save(commit=False)
