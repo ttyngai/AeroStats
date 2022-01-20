@@ -44,7 +44,7 @@ def home(request):
         'latitude': 'n/a',
         'altitude': 'n/a',
         'on_ground': 'n/a',
-        'velocity': 0,
+        'velocity': 'n/a',
         'true_track': 'n/a',
         'vertical_rate': 'n/a',
         }
@@ -69,15 +69,19 @@ class PlaneDelete(DeleteView):
 
 def add_plane(request):
   # create a ModelForm instance using the data in the posted form
-  print('hello')
-  print(request.POST)
-
-  form = PlaneForm(request.POST)
-  # validate the data
-  if form.is_valid():
-    new_plane = form.save(commit=False)
-    print(new_plane)
-    new_plane.save()
+  planes = Plane.objects.all()
+  already_in_db = False
+  for plane in planes:
+    if plane.icao24 == request.POST['icao24']:
+      print('Exists, Not adding')
+      already_in_db = True
+  if already_in_db == False:
+    print('New, Adding')
+    form = PlaneForm(request.POST)
+    # validate the data
+    if form.is_valid():
+      new_plane = form.save(commit=False)
+      new_plane.save()
   return redirect('home')
 
 def planes_detail(request, plane_id):
