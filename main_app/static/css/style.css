@@ -1,7 +1,16 @@
+a {
+  text-decoration: none;
+  /* color: white; */
+}
+/* .btn {
+  height: 25px;
+  line-height: inherit;
+  padding: 0 5px;
+} */
+
 .leaflet-interactive {
   transform: rotate(90deg);
 }
-
 
 .watchlist-show {
   display: block;
@@ -9,10 +18,59 @@
 
 .watchlist-hide {
   display: none;
+  z-index: 0;
+}
+
+.watchlist-style {
+  width: 80vw;
+  height: 80vh;
+  padding: 50px;
+  top: 50%;
+  left: 50%;
+  margin: -40vh 0 0 -40vw;
+  position: absolute;
+  overflow: scroll;
+  z-index: 0;
+  background-color: white;
+  opacity: 0.9;
+  /* margin: 0 auto; */
+  overflow-x: hidden;
+}
+
+.watchlist-container {
+  width: 90vw;
+}
+
+.close-watchlist-button {
+  position: absolute;
+  right: 50px;
+  background-color: lightgrey;
+  border-radius: 10px;
+}
+.close-watchlist-button:hover {
+  background-color: grey;
+}
+
+.map-style {
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
 }
 
 .watchlist-unhide {
   display: none;
+}
+
+.login-style {
+  width: 90vw;
+  height: 80vh;
+  padding: 10vw;
+  position: absolute;
+  top: 10vh;
+  left: 10vh;
+  z-index: 0;
+  background-color: white;
+  opacity: 0.8;
 }
 
 .login-show {
@@ -21,6 +79,20 @@
 
 .login-hide {
   display: none;
+}
+
+.nav-container {
+  /* border: 1px solid lightgray; */
+  /* border-radius: 5vh; */
+
+  position: absolute;
+  padding: 10px;
+  top: 5vh;
+  right: 1vw;
+  z-index: 0;
+  color: white;
+  background-color: grey;
+  opacity: 0.8;
 }
 
 .nav-show {
@@ -35,3 +107,57 @@
   display: none;
 }
 
+.menu-style {
+  /* border: 1vh solid lightgray; */
+  /* border-radius: 5vh; */
+
+  position: absolute;
+  top: 1vh;
+  right: 1vw;
+  z-index: 0;
+  background-color: white;
+  opacity: 0.8;
+}
+
+.nav-content {
+  margin: auto;
+}
+
+.nav-button {
+  color: white;
+  font-size: 16px;
+  padding: 10px;
+}
+
+.menu-button {
+  font-size: 18px;
+}
+
+.btn-delete {
+  background-color: rgb(167, 1, 1);
+  border-radius: 10px;
+}
+.btn-delete:hover {
+  background-color: red;
+}
+
+.offline {
+  background-color: grey;
+}
+
+::-webkit-scrollbar {
+  width: 2px;
+  border: 1px solid #d5d5d5;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 0;
+  background: transparent;
+  color: transparent;
+  display: none;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 0;
+  background: #b0b0b0;
+}
