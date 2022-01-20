@@ -244,6 +244,7 @@
                   </ul>
                 {% else %}
                   No comments on this plane.
+
                 {% endif %}
               `;
               if(! watchlist.includes(f[0])) {
@@ -341,7 +342,7 @@
           console.log(`${icao24} Not Active`);
         }
       });
-      
+
     updatePlaneMarkers();
   }
 
@@ -390,7 +391,7 @@
       document.getElementById('nav').classList.add('nav-hide');
     }
   }
-  
+
   let menuClicked = false
   function toggleMenuColor(){
     if (!menuClicked) {
@@ -423,7 +424,7 @@
   function hideLogin() {
     document.getElementById('login').classList.remove('login-show');
     document.getElementById('login').classList.add('login-hide');
-  }  
+  }
 </script>
 
 {% endblock %}

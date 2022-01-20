@@ -18,10 +18,12 @@ def home(request):
   watchlist=[]
   login_form = AuthenticationForm()
   passengers = Passenger.objects.all()
+  # comments = Comment.objects.filter(plane = request.)
+  comments = Comment.objects.all()
 
   if (watch_db and len(watch_db) != 0):
     query_url = f'https://opensky-network.org/api/states/all?icao24={watch_db[0].icao24}'
-    
+
     for idx, plane in enumerate(watch_db):
       if (idx > 0):
         newString = f"&icao24={plane.icao24}"
@@ -30,7 +32,7 @@ def home(request):
     if(flight_data['states'] != None):
       for flight in flight_data['states']:
         for plane in watch_db:
-          if plane.icao24 == flight[0]:  
+          if plane.icao24 == flight[0]:
             f = {
             'icao24': flight[0],
             'callsign': flight[1],
@@ -70,6 +72,7 @@ def home(request):
     'login_form': login_form,
     'watchlist_populated': watchlist,
     'passengers': passengers,
+    'comments': comments,
   })
 
 
