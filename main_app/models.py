@@ -34,3 +34,11 @@ class Plane(models.Model):
   def __str__(self):
     return self.icao24
 
+class Comment(models.Model):
+  date = models.DateTimeField(auto_now=True)
+  content = models.CharField(max_length=255)
+  user = models.ForeignKey(User, on_delete=models.CASCADE)
+  plane = models.ForeignKey(Plane, on_delete=models.CASCADE)
+
+  def __str__(self):
+    return f"{self.content} on {self.date}"

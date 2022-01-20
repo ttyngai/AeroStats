@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Plane, Passenger
+from .models import Comment, Plane, Passenger
 
 class PlaneForm(ModelForm):
   class Meta:
@@ -10,3 +10,8 @@ class PassengerForm(ModelForm):
   class Meta:
     model = Passenger
     fields = ['name']
+
+class CommentForm(ModelForm):
+  class Meta:
+    model = Comment
+    fields = ['content']

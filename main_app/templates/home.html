@@ -233,6 +233,49 @@
                 </div>
                 `;
               }
+              popupText += `
+              <br>
+                <h5>Comments:</h5>
+                {% if comments %}
+                  <ul>
+                    {% for comment in comments %}
+                      <li>{{ comment.content }}</li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  No comments on this plane.
+                {% endif %}
+              `;
+              if(! watchlist.includes(f[0])) {
+                popupText += `
+                {% if user.is_authenticated %}
+                <form action="/planes/create/" method="post">
+                  {% csrf_token %}
+                  <input value="${f[0]}" type="hidden" name="icao24">
+                  <input type="submit" onclick="localStorage.openWatchlist=true;" value="Add to Watchlist" class="btn">
+                </form>
+                {% endif %}
+                `;
+              } else {
+                popupText += `
+                <div>
+                  Add a comment:
+                  <form action="/planes/{{plane.id}}/assoc_comment/" method="post">
+                    {% csrf_token %}
+                    <input value="${f[0]}" type="hidden" name="icao24">
+                    <input type="submit" onclick="localStorage.openWatchlist=true;" value="Add Comment" class="btn">
+                  </form>
+                  Create new comment and add:
+                  <form action="/comments/create/" method="post">
+                    {% csrf_token %}
+                    <input type="text" name="content" maxlength="50" required id="id_name" placeholder="Comment content...">
+                    <input value="${f[0]}" type="hidden" name="icao24">
+                    <input type="submit" value="Create Comment" class="btn">
+                  </form>
+                </div>
+                `;
+              }
+
 
               L.marker([f[6], f[5]], { icon: planeMarker })
                 .addTo(map)
