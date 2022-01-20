@@ -11,4 +11,7 @@ urlpatterns = [
   path('passengers/create/', views.create_passenger, name='passengers_create'),
   path('passengers/<int:pk>/update/', views.PassengerUpdate.as_view(), name='passengers_update'),
   path('passengers/<int:pk>/delete/', views.PassengerDelete.as_view(), name='passengers_delete'),
+  path('comments/create/', views.add_comment, name='comments_create'),
+  path('comments/<int:pk>/update/', views.CommentUpdate.as_view(), name='comments_update'),
+  path('comments/<int:pk>/delete/', views.CommentDelete.as_view(), name='comments_delete'),
 ]

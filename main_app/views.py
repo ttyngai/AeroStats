@@ -5,8 +5,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Plane, Passenger
-from .forms import PlaneForm, PassengerForm
+from .models import Plane, Passenger, Comment
+from .forms import PlaneForm, PassengerForm, CommentForm
 import requests
 
 def home(request):
@@ -105,11 +105,33 @@ def add_plane(request):
       new_plane.save()
   return redirect('home')
 
+
 def planes_detail(request, plane_id):
   plane = Plane.objects.get(id=plane_id)
   return render(request, 'planes/detail.html', {
     'plane': plane
   })
+
+@login_required
+def add_comment(request):
+  plane = Plane.objects.get(icao24=request.POST['icao24'])
+  print('hello')
+  form = CommentForm(request.POST)
+  form.instance.user = request.user
+  form.instance.plane_id = plane.id
+  print(form)
+  if form.is_valid():
+    new_comment = form.save(commit=False)
+    new_comment.save()
+    print('oh no')
+  return redirect('home')
+
+class CommentUpdate(LoginRequiredMixin, UpdateView):
+  model = Comment
+  fields = ['comment']
+
+class CommentDelete(LoginRequiredMixin, DeleteView):
+  model = Comment
 
 @login_required
 def assoc_passenger(request, plane_id):
