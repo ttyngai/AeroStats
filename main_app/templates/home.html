@@ -239,6 +239,9 @@
                 {% if comments %}
                   <ul>
                     {% for comment in comments %}
+                      {%if user.is_authenticated%}
+                      <li><span onclick="editComment({{comment.id}})" id="commentContent{{comment.id}}">{{comment.content}}</span></li>
+                      {% endif %}
                       <li>{{ comment.content }}</li>
                     {% endfor %}
                   </ul>
@@ -424,6 +427,11 @@
   function hideLogin() {
     document.getElementById('login').classList.remove('login-show');
     document.getElementById('login').classList.add('login-hide');
+  }
+  function editComment(comment_id) {
+    comment_content = document.getElementById('commentContent' + comment_id).textContent;
+    document.getElementById('commentContent' + comment_id).onclick=null;
+    document.getElementById('commentContent' + comment_id).innerHTML=`<form method="POST" action="/comments/${comment_id}/update/">{% csrf_token %}<input type="text" name="content" value="${comment_content}"><input type="submit" value="Update"></form>`
   }
 </script>
 
