@@ -1,75 +1,9 @@
 {% extends 'base.html' %} {% block content %}
-<map onclick="hideWatchlist(); hideMenu();">
+<!-- Map container -->
+<map onclick="hideWatchlist(); hideMenu(); menuUnclickedColor()">
   <div id="map" class="map-style"></div>
 </map>
-<watchlist>
-  <div
-    id="watchlist"
-    class="watchlist-hide watchlist-style"
-  >
-  <button onclick="hideWatchlist()" class='btn close-watchlist-button'>X</button>
-    <h3>Aircraft Watchlist</h3>
-    <table>
-      <thead >
-        <tr>
-
-            <th>Transponder</th>
-
-            <th>Origin</th>
-            <th>Velocity</th>
-            <th>Altitude</th>
-            <th></th>
-            <th></th>
-        </tr>
-      </thead>
-    </div>
-    <tbody >
-    {% for plane_detail in watchlist_populated%}
-        <tr>
-          {%if plane_detail.callsign != 'n/a'%}
-          <td>{{plane_detail.icao24|upper}}</td>
-
-          <td>{{plane_detail.origin_country}}</td>
-          <td>{{plane_detail.velocity}} m/s</td>
-
-
-          {%if plane_detail.altitude %}
-          <td>{{plane_detail.altitude}} m</td>
-          {%else%}
-          <td>Grounded</td>
-          {%endif%}
-
-
-          {%else%}
-          
-          <td>{{plane_detail.icao24|upper}}</td>
-
-          <td>n/a</td>
-          <td>n/a</td>
-          <td>n/a</td>
-
-          {%endif%}
-
-          {%if plane_detail.callsign != 'n/a'%}
-          <td><a class="btn" href = "#" onclick="hideWatchlist(); findPlane('{{plane_detail.icao24}}')">Locate</a></td>
-          {% else %}
-          <td><a class="btn" disabled href = "#" onclick="hideWatchlist(); findPlane('{{plane_detail.icao24}}')">Offline</a></td>
-          {% endif%}
-          {%for plane in watchlist%}
-          {% if plane_detail.icao24 == plane.icao24 %}
-          <td><a class="btn btn-delete" href="{% url 'planes_delete' plane.id %}">X</a></td>
-          {%endif%}
-          {%endfor%}
-        </tr>
-        {%endfor%}
-      </tbody>
-    </table>
-
-
-
-
-  </div>
-</watchlist>
+<!-- Menu Button -->
 <nav-container>
   <div
     id="nav"
@@ -77,16 +11,28 @@
   >
     <ul class="nav-content">
       {% if user.is_authenticated %}
-      <li><a href="#" class="nav-button" onclick="showWatchlist(); hideMenu(); hideWatchlist();">Watchlist</a></li>
-      <li><a href="#" class="nav-button" onclick="gotoMyLocation(); hideMenu(); hideWatchlist();">My Location</a></li>
-      <li><a class="nav-button" href="/accounts/logout/?next=/">Logout</a></li>
+      <li><a href="#" class="btn nav-button" onclick="showWatchlist(); hideMenu(); hideWatchlist(); menuUnclickedColor()">Watchlist</a></li>
+      <li><a href="#" class="btn nav-button" onclick="gotoMyLocation(); hideMenu(); hideWatchlist(); menuUnclickedColor()">My Location</a></li>
+      <li><a class="btn nav-button" href="/accounts/logout/?next=/">Logout</a></li>
       {% else %}
-      <li><a href="#" class="nav-button" onclick="showLogin(); hideMenu()">Log In</a></li>
+      <li><a href="#" class="btn nav-button" onclick="showLogin(); hideMenu();  menuUnclickedColor()">Log In</a></li>
       {% endif %}
-
-
   </div>
 </nav-container>
+<!-- Nav Buttons container -->
+<menu-button>
+  <div
+    id="menu-button"
+class="menu-style"
+  >
+    <a href="#" onclick="toggleMenu(); toggleMenuColor()"
+      >
+      <span id="menu_button" class="btn menu-button">MENU</span>
+      </a
+    >
+  </div>
+</menu-button>
+<!-- Login window -->
 <login>
   <div
     id="login"
@@ -101,18 +47,66 @@
     </form>
   </div>
 </login>
-<menu-button>
+<!-- Watchlist -->
+<watchlist>
   <div
-    id="menu-button"
-class="menu-style"
+    id="watchlist"
+    class="watchlist-hide watchlist-style"
   >
-    <a href="#" onclick="toggleMenu()"
-      >
-      <span class="btn menu-button">MENU</span>
-      </a
-    >
+  <button onclick="hideWatchlist(); menuUnclickedColor()" class='btn close-watchlist-button'>X</button>
+    <h3>Aircraft Watchlist</h3>
+    <table>
+      <thead >
+        <tr>
+            <th>Transponder</th>
+            <th>Origin</th>
+            <th>Velocity</th>
+            <th>Altitude</th>
+            <th></th>
+            <th></th>
+        </tr>
+      </thead>
+    </div>
+    <tbody >
+    {% for plane_detail in watchlist_populated%}
+        <tr>
+          {%if plane_detail.callsign != 'n/a'%}
+          <td>{{plane_detail.icao24|upper}}</td>
+          <td>{{plane_detail.origin_country}}</td>
+          <td>{{plane_detail.velocity}} m/s</td>
+          {%if plane_detail.altitude %}
+          <td>{{plane_detail.altitude}} m</td>
+          {%else%}
+          <td>Grounded</td>
+          {%endif%}
+          {%else%}
+          <td>{{plane_detail.icao24|upper}}</td>
+          <td>n/a</td>
+          <td>n/a</td>
+          <td>n/a</td>
+          {%endif%}
+          {%if plane_detail.callsign != 'n/a'%}
+          <td><a class="btn" href = "#" onclick="hideWatchlist(); findPlane('{{plane_detail.icao24}}')">Locate</a></td>
+          {% else %}
+          <td><a class="btn" disabled href = "#" onclick="hideWatchlist(); findPlane('{{plane_detail.icao24}}')">Offline</a></td>
+          {% endif%}
+          {%for plane in watchlist%}
+          {% if plane_detail.icao24 == plane.icao24 %}
+          <td>
+            <form action="planes/{{plane.id}}/delete/" method="POST">
+              {% csrf_token %}
+              <input type="submit" value="X" class="btn btn-delete" onclick="localStorage.openWatchlist=true;" ></input>
+            </form>
+          </td>
+          {%endif%}
+          {%endfor%}
+        </tr>
+        {%endfor%}
+      </tbody>
+    </table>
   </div>
-</menu-button>
+</watchlist>
+
 <script>
   // San Fransico as default map location
   let latMax = 38;
@@ -131,7 +125,7 @@ class="menu-style"
   } else {
     gotoMyLocation();
   }
-
+  // Define Map
   var map = L.map('map', { tap: false }).fitBounds([
     [latMin, longMax],
     [latMax, longMin],
@@ -149,11 +143,10 @@ class="menu-style"
         'pk.eyJ1Ijoic2R1cHJlZSIsImEiOiJja3hpNXoyNGw0dWUxMnBtdTQ5ZjI4MmZsIn0.19iQPPtrr4jFeqmOLEJ1BA',
     }
   ).addTo(map);
+  // Initialize plane markers + updates
+  autoUpdate();
   // Remove leftover shadow layer upon map creation
   document.getElementsByClassName('leaflet-shadow-pane')[0].remove();
-
-  // Draws marker on first load
-  // updatePlaneMarkers();
 
   map.on('moveend', async function () {
     // call update plane marker function
@@ -163,7 +156,6 @@ class="menu-style"
   });
 
   // Auto update planes
-  autoUpdate();
   function autoUpdate() {
     document.getElementsByClassName('leaflet-marker-pane')[0].innerHTML = '';
     updatePlaneMarkers();
@@ -212,7 +204,7 @@ class="menu-style"
                   )}°W</div><br><form action="/planes/create/" method="post">
             {% csrf_token %}
             <input value="${f[0]}" type="hidden" name="icao24">
-            <input type="submit" value="Add to Watchlist" class="btn">
+            <input type="submit" onclick="localStorage.openWatchlist=true;" value="Add to Watchlist" class="btn">
             </form>`
                 );
               // Add rotation
@@ -289,10 +281,17 @@ class="menu-style"
   function getNewbounds() {
     localStorage.aeroStatsBounds = JSON.stringify(map.getBounds());
   }
-
+  openWatchlistOnReload()
+  function openWatchlistOnReload(){
+    if (localStorage.openWatchlist) {
+      showWatchlist(); hideMenu(); hideWatchlist()
+      delete localStorage.openWatchlist
+    }
+  }
   function showWatchlist() {
     document.getElementById('watchlist').classList.remove('watchlist-hide');
     document.getElementById('watchlist').classList.add('watchlist-unhide');
+    map.closePopup()
   }
   function hideWatchlist() {
     if (
@@ -308,18 +307,36 @@ class="menu-style"
     }
   }
   function toggleMenu() {
-
     if (document.getElementById('nav').classList.contains('nav-hide')){
     document.getElementById('nav').classList.remove('nav-hide');
     document.getElementById('nav').classList.add('nav-show');
     document.getElementById('watchlist').classList.remove('watchlist-show');
     document.getElementById('watchlist').classList.add('watchlist-hide');
-  } else {
-    document.getElementById('nav').classList.remove('nav-show');
-    document.getElementById('nav').classList.add('nav-hide');
+    } else {
+      document.getElementById('nav').classList.remove('nav-show');
+      document.getElementById('nav').classList.add('nav-hide');
+    }
+  }
+  
+  let menuClicked = false
+  function toggleMenuColor(){
+    if (!menuClicked) {
+      document.getElementById('menu_button').style.backgroundColor = '#7b7b7b'
+    } else {
+      document.getElementById('menu_button').style.backgroundColor = '#26a69a'
+    }
+    menuClicked = !menuClicked
   }
 
+  function menuClickedColor(){
+    document.getElementById('menu_button').style.backgroundColor = '#7b7b7b'
+      menuClicked = true
   }
+  function menuUnclickedColor(){
+      document.getElementById('menu_button').style.backgroundColor = '#26a69a'
+      menuClicked = false
+  }
+
   function hideMenu() {
     document.getElementById('nav').classList.remove('nav-show');
     document.getElementById('nav').classList.add('nav-hide');
