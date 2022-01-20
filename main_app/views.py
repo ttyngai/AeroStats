@@ -131,7 +131,8 @@ def add_comment(request):
 
 class CommentUpdate(LoginRequiredMixin, UpdateView):
   model = Comment
-  fields = ['comment']
+  fields = ['content']
+  success_url = "/"
 
 class CommentDelete(LoginRequiredMixin, DeleteView):
   model = Comment
