@@ -21,23 +21,23 @@ def home(request):
         newString = f"&icao24={plane.icao24}"
         query_url += newString
     flight_data = requests.get(f'{query_url}').json()
-    
-    for flight in flight_data['states']:
-      for plane in watch_db:
-        if plane.icao24 == flight[0]:  
-          f = {
-          'icao24': flight[0],
-          'callsign': flight[1],
-          'origin_country': flight[2],
-          'longitude': flight[5],
-          'latitude': flight[6],
-          'altitude': flight[7],
-          'on_ground': flight[8],
-          'velocity': flight[9],
-          'true_track': flight[10],
-          'vertical_rate': flight[11]
-          }
-          watchlist.append(f)
+    if(flight_data['states'] != None):
+      for flight in flight_data['states']:
+        for plane in watch_db:
+          if plane.icao24 == flight[0]:  
+            f = {
+            'icao24': flight[0],
+            'callsign': flight[1],
+            'origin_country': flight[2],
+            'longitude': flight[5],
+            'latitude': flight[6],
+            'altitude': flight[7],
+            'on_ground': flight[8],
+            'velocity': flight[9],
+            'true_track': flight[10],
+            'vertical_rate': flight[11]
+            }
+            watchlist.append(f)
     watchlist = sorted(watchlist, key=lambda flight: flight['icao24'])
     for plane in watch_db:
       not_online = True
