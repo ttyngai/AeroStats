@@ -70,7 +70,6 @@ def home(request):
     'login_form': login_form,
     'watchlist_populated': watchlist,
     'passengers': passengers,
-    'plane': plane
   })
 
 
@@ -120,16 +119,19 @@ def assoc_passenger(request, plane_id):
 
 @login_required
 def create_passenger(request):
-  print("Hello.")
-  print(request.POST)
-  plane = Plane.objects.get(id=request.POST['plane_id'])
-  print(plane.passengers)
+  plane = Plane.objects.get(icao24=request.POST['icao24'])
+  print("Plane ID", plane.id)
+  print("Passengers:", plane.passengers)
   form = PassengerForm(request.POST)
-  form.instance.user = request.user  # Add logged in user to form.
+  #form.instance.user = request.user  # Add logged in user to form.
+  print(form)
   if form.is_valid():
+    print("Fom is valid!")
     new_passenger = form.save(commit=False)
     new_passenger.save()
     Plane.objects.get(id=plane.id).passengers.add(new_passenger.id)
+  else:
+    print("Form is not valid.")
   return redirect('home')
 
 class PassengerCreate(LoginRequiredMixin, CreateView):
