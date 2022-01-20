@@ -1,24 +1,11 @@
 {% extends 'base.html' %} {% block content %}
 <map onclick="hideWatchlist(); hideMenu();">
-  <div id="map" style="width: 100vw; height: 100vh; z-index: 0"></div>
+  <div id="map" class="map-style"></div>
 </map>
 <watchlist>
   <div
     id="watchlist"
-    class="watchlist-hide"
-    style="
-      width: 90vw;
-      height: 80vh;
-      padding: 10vw;
-      border: 1vh solid lightgray;
-      border-radius: 5vh;
-      position: absolute;
-      top: 10vh;
-      left: 10vh;
-      z-index: 0;
-      background-color: white;
-      opacity: 0.8;
-    "
+    class="watchlist-hide watchlist-style"
   >
     <h1>Watchlist</h1>
     {%for plane in watchlist%}
@@ -27,33 +14,21 @@
       <a href="{% url 'planes_delete' plane.id %}">Delete</a>
     </div>
 
-
     {%endfor%}
   </div>
 </watchlist>
 <nav-container>
   <div
     id="nav"
-    class="nav-hide"
-    style="
-      border: 1vh solid lightgray;
-      border-radius: 5vh;
-      position: absolute;
-      top: 10vh;
-      right: 1vw;
-      z-index: 0;
-      background-color: white;
-      opacity: 0.8;
-    "
+    class="nav-hide nav-container"
   >
-    <ul>
+    <ul class="nav-content">
       {% if user.is_authenticated %}
-      <li><a href="#" onclick="showWatchlist(); hideMenu(); hideWatchlist();">Watchlist</a></li>
-      <li><a href="#"></a></li>
-      <li class="divider"></li>
-      <li><a href="/accounts/logout/?next=/">Logout</a></li>
+      <li><a href="#" class="nav-button" onclick="showWatchlist(); hideMenu(); hideWatchlist();">Watchlist</a></li>
+      <li><a href="#" class="nav-button" onclick="gotoMyLocation(); hideMenu(); hideWatchlist();">My Location</a></li>
+      <li><a class="nav-button" href="/accounts/logout/?next=/">Logout</a></li>
       {% else %}
-      <li><a href="#" onclick="showLogin(); hideMenu()">Log In</a></li>
+      <li><a href="#" class="nav-button" onclick="showLogin(); hideMenu()">Log In</a></li>
       {% endif %}
 
 
@@ -62,20 +37,7 @@
 <login>
   <div
     id="login"
-    class="login-hide"
-    style="
-      width: 90vw;
-      height: 80vh;
-      padding: 10vw;
-      border: 1vh solid lightgray;
-      border-radius: 5vh;
-      position: absolute;
-      top: 10vh;
-      left: 10vh;
-      z-index: 0;
-      background-color: white;
-      opacity: 0.8;
-    "
+    class="login-style login-hide"
   >
     <h1>login</h1>
     <form action="/accounts/login/" method="POST">
@@ -89,20 +51,12 @@
 <menu-button>
   <div
     id="menu-button"
-    style="
-      /*height: 3vh;*/
-      border: 1vh solid lightgray;
-      border-radius: 5vh;
-      position: absolute;
-      top: 1vh;
-      right: 1vw;
-      z-index: 0;
-      background-color: white;
-      opacity: 0.8;
-    "
+class="menu-style"
   >
-    <a href="#" onclick="showMenu()"
-      ><span style="font-size: 5vh">✈️ AeroStats [=]</span></a
+    <a href="#" onclick="toggleMenu()"
+      >
+      <span class="btn menu-button">MENU</span>
+      </a
     >
   </div>
 </menu-button>
@@ -218,50 +172,7 @@
                     .length - 1
                 ].style.transform
               } rotate(${f[10]}deg)`;
-              // // Add transform back to center Y axis
-              // document.getElementsByClassName('leaflet-marker-icon')[
-              //   document.getElementsByClassName('leaflet-marker-icon').length -
-              //     1
-              // ].style.marginTop = `${
-              //   parseFloat(
-              //     document
-              //       .getElementsByClassName('leaflet-marker-icon')
-              //       [
-              //         document.getElementsByClassName('leaflet-marker-icon')
-              //           .length - 1
-              //       ].style.marginTop.substring(
-              //         0,
-              //         document
-              //           .getElementsByClassName('leaflet-marker-icon')
-              //           [
-              //             document.getElementsByClassName('leaflet-marker-icon')
-              //               .length - 1
-              //           ].style.marginTop.indexOf('px')
-              //       )
-              //   ) / 2
-              // }px`;
-              // // Add transform back to center X axis
-              // document.getElementsByClassName('leaflet-marker-icon')[
-              //   document.getElementsByClassName('leaflet-marker-icon').length -
-              //     1
-              // ].style.marginLeft = `${
-              //   parseFloat(
-              //     document
-              //       .getElementsByClassName('leaflet-marker-icon')
-              //       [
-              //         document.getElementsByClassName('leaflet-marker-icon')
-              //           .length - 1
-              //       ].style.marginTop.substring(
-              //         0,
-              //         document
-              //           .getElementsByClassName('leaflet-marker-icon')
-              //           [
-              //             document.getElementsByClassName('leaflet-marker-icon')
-              //               .length - 1
-              //           ].style.marginLeft.indexOf('px')
-              //       )
-              //   ) / 2
-              // }px`;
+
             }
           });
         }
@@ -344,11 +255,18 @@
       document.getElementById('watchlist').classList.add('watchlist-hide');
     }
   }
-  function showMenu() {
+  function toggleMenu() {
+
+    if (document.getElementById('nav').classList.contains('nav-hide')){
     document.getElementById('nav').classList.remove('nav-hide');
     document.getElementById('nav').classList.add('nav-show');
     document.getElementById('watchlist').classList.remove('watchlist-show');
     document.getElementById('watchlist').classList.add('watchlist-hide');
+  } else {
+    document.getElementById('nav').classList.remove('nav-show');
+    document.getElementById('nav').classList.add('nav-hide');
+  }
+
   }
   function hideMenu() {
     document.getElementById('nav').classList.remove('nav-show');
