@@ -29,6 +29,7 @@ def home(request):
         'vertical_rate': flight[11]
         }
         watchlist.append(f)
+  watchlist = sorted(watchlist, key=lambda flight: flight['icao24'])
   for plane in watch_db:
     not_online = True
     for f in watchlist:
