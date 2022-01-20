@@ -193,33 +193,35 @@
                 <div>${f[11] < 0 ? 'Descending' : 'Ascending'} at ${Math.abs(f[11])} m/s</div>
                 <div>Lat: ${f[6].toFixed(2)}°N Long: ${f[5].toFixed(2)}°W</div>
                 <br>
+                <h5>Passengers:</h5>
+                {% if passengers %}
+                  <ul>
+                    {% for passenger in passengers %}
+                      <li>{{ passenger.name }}</li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  No passengers on this plane.
+                {% endif %}
               `;
               if(! watchlist.includes(f[0])) {
                 popupText += `
+                {% if user.is_authenticated %}
                 <form action="/planes/create/" method="post">
                   {% csrf_token %}
                   <input value="${f[0]}" type="hidden" name="icao24">
                   <input type="submit" onclick="localStorage.openWatchlist=true;" value="Add to Watchlist" class="btn">
                 </form>
+                {% endif %}
                 `;
               } else {
                 popupText += `
                 <div>
-                  <h5>Passengers:</h5>
-                  {% if passengers %}
-                    <ul>
-                      {% for passenger in passengers %}
-                        <li>{{ passenger.name }}</li>
-                      {% endfor %}
-                    </ul>
-                  {% else %}
-                    No passengers on this plane.
-                  {% endif %}
                   Add a passenger:
                   <form action="/planes/{{plane.id}}/assoc_passenger/" method="post">
                     {% csrf_token %}
                     <input value="${f[0]}" type="hidden" name="icao24">
-                    <input type="submit" onclick="localStorage.openWatchlist=true;" value="Add to Watchlist" class="btn">
+                    <input type="submit" onclick="localStorage.openWatchlist=true;" value="Add Passenger" class="btn">
                   </form>
                   Create new passenger and add:
                   <form action="/passengers/create/" method="post">
