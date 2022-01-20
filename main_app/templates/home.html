@@ -22,7 +22,12 @@
   >
     <h1>Watchlist</h1>
     {%for plane in watchlist%}
-    <p>{{plane.icao24}}<a href = "#" onclick="hideWatchlist(); findPlane('{{plane.icao24}}')">go</a></p>
+    <p>{{plane.icao24}}<a href = "#" onclick="hideWatchlist(); findPlane('{{plane.icao24}}')">Go</a></p>
+    <div class="card-action">
+      <a href="{% url 'planes_delete' plane.id %}">Delete</a>
+    </div>
+
+
     {%endfor%}
   </div>
 </watchlist>

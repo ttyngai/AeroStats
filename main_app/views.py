@@ -37,3 +37,9 @@ def add_plane(request):
     print(new_plane)
     new_plane.save()
   return redirect('home')
+
+def planes_detail(request, plane_id):
+  plane = Plane.objects.get(id=plane_id)
+  return render(request, 'planes/detail.html', {
+    'plane': plane
+  })
