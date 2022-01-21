@@ -15,7 +15,7 @@ def home(request):
     watch_db = Plane.objects.filter(user = request.user)
   else:
     watch_db = None
-
+# watch_db.passengers
   watchlist=[]
   login_form = AuthenticationForm()
   signup_form = UserCreationForm()
@@ -70,6 +70,7 @@ def home(request):
         watchlist.append(f)
   return render(request, 'home.html', {
     'watchlist': watch_db,
+    # contains watch_db.passengers
     'login_form': login_form,
     'signup_form': signup_form,
     'watchlist_populated': watchlist,
@@ -119,7 +120,6 @@ def planes_detail(request, plane_id):
 
 @login_required
 def add_comment(request):
-  print(request.user)
   plane = Plane.objects.filter(icao24=request.POST['icao24']).filter(user=request.user)[0]
   form = CommentForm(request.POST)
   form.instance.user = request.user
@@ -145,14 +145,16 @@ def assoc_passenger(request, plane_id):
 
 @login_required
 def create_passenger(request):
-  plane = Plane.objects.get(icao24=request.POST['icao24'])
-  print("Plane ID", plane.id)
-  print("Passengers:", plane.passengers)
+  print('Plane user req',request.user.id)
+  # plane = Plane.objects.get(icao24=request.POST['icao24'])
+  plane = Plane.objects.filter(icao24=request.POST['icao24']).filter(user=request.user)[0]
+  print('plane user plane',plane.user_id)
+
   form = PassengerForm(request.POST)
   #form.instance.user = request.user  # Add logged in user to form.
-  print(form)
+
   if form.is_valid():
-    print("Fom is valid!")
+
     new_passenger = form.save(commit=False)
     new_passenger.save()
     Plane.objects.get(id=plane.id).passengers.add(new_passenger.id)
