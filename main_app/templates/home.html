@@ -110,7 +110,6 @@
 <script>
 
 
-
   // San Fransico as default map location
   let latMax = 38;
   let latMin = 37;
@@ -200,6 +199,7 @@
             /* Isolate comments based on icao24. */
             
  // Same as updatePlaneMarkers() ----> 
+ 
  let comments_js = [];
             let i = 0;
             {% for comment in comments %}
@@ -250,6 +250,7 @@
                     {% csrf_token %}
                     <input type="text" name="name" maxlength="50" required id="id_name" placeholder="Passenger name...">
                     <input value="${f[0]}" type="hidden" name="icao24">
+                    
                     <input type="submit" value="Create Passenger" onclick="localStorage.openPopupIcao24='${f[0]}'"  class="btn-small">
                   </form>
                 </div>
@@ -372,6 +373,7 @@
                 <div>Lat: ${f[6].toFixed(2)}°N Long: ${f[5].toFixed(2)}°W</div>
 
                 <h5>Passengers:</h5>
+                
                 {% if passengers %}
                   <ul>
                     {% for passenger in passengers %}
@@ -556,9 +558,6 @@
     document.getElementById('signup').classList.add('signup-hide');
   }
   function editComment(comment_id, comment_user_id) {
-
-    console.log('{{ user.id}}', comment_user_id)
-
     if ('{{ user.id}}' == comment_user_id){
     comment_content = document.getElementById('commentContent' + comment_id).textContent;
     document.getElementById('commentContent' + comment_id).onclick=null;
