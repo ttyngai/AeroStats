@@ -278,6 +278,7 @@
                 popupText += `
                 {% if user.is_authenticated %}
                 <div id="comments2">
+                  <br>
                 <form action="/planes/create/" method="post">
                   {% csrf_token %}
                   <input value="${f[0]}" type="hidden" name="icao24">
@@ -416,12 +417,13 @@
                 }
                 popupText += '</ul><div>'
               } else {
-                popupText += `<div id="comments"><h5>Comments</h5>No comments on this plane.</div>`
+                popupText += `<div id="comments"><h5>Comments</h5>No comments on this plane.<br></div>`
               }
               if(! watchlist.includes(f[0])) {
                 popupText += `
                 {% if user.is_authenticated %}
                 <div id="comments2">
+                  <br>
                 <form action="/planes/create/" method="post">
                   {% csrf_token %}
                   <input value="${f[0]}" type="hidden" name="icao24">
