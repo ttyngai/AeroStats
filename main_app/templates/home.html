@@ -172,6 +172,17 @@
       .then((data) => {
         if (data.states) {
           data.states.forEach(function (f) {
+            /* Isolate comments based on icao24. */
+            let comments_js = [];
+            console.log(comments_js);
+            let i = 0;
+            {% for comment in comments %}
+              comments_js['{{comment.plane}}'] = [];
+              comments_js['{{comment.plane}}'].push({'content': '{{comment.content}}',
+                  'date': '{{comment.date}}'
+              });
+              i++;
+            {% endfor %}
             watchlist = [];
             {% for plane in watchlist %}
               watchlist.push('{{plane.icao24}}');
@@ -235,22 +246,22 @@
               }
               popupText += `
               <br>
-                <h5>Comments:</h5>
-                {% if comments %}
-                  <ul>
-                    {% for comment in comments %}
-                      {%if user.is_authenticated%}
-                      <li><span onclick="editComment({{comment.id}})" id="commentContent{{comment.id}}">{{comment.content}}</span></li>
-                      {% else %}
-                      <li>{{ comment.content }}</li>
-                      {% endif %}
-                    {% endfor %}
-                  </ul>
-                {% else %}
-                  No comments on this plane.
-
-                {% endif %}
-              `;
+                <h5>Comments:</h5>`
+                console.log(comments_js[f[0]]);
+              if(comments_js[f[0]] && comments_js[f[0]].length > 0) {
+                popupText += '<ul>';
+                for(comment of comments_js[f[0]]) {
+                  console.log(comment);
+                  {%if user.is_authenticated%}
+                    popupText += `<li><span onclick="editComment(${comment.id})" id="commentContent${comment.id}">${comment.content}</span></li>`;
+                  {% else %}
+                    popupText += `<li>${ comment.content }</li>`
+                  {% endif %}
+                }
+                popupText += '</ul>'
+              } else {
+                popupText += 'No comments on this plane.'
+              }
               if(! watchlist.includes(f[0])) {
                 popupText += `
                 {% if user.is_authenticated %}
