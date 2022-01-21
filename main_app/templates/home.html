@@ -206,7 +206,8 @@
               if(! ('{{comment.plane}}' in comments_js)) comments_js['{{comment.plane}}'] = [];
               comments_js['{{comment.plane}}'].push({'content': '{{comment.content}}',
                   'date': '{{comment.date}}',
-                  'id': '{{comment.id}}'
+                  'id': '{{comment.id}}',
+                  'user': '{{comment.user_id}}'
               });
               i++;
             {% endfor %}
@@ -261,7 +262,7 @@
                 popupText += '<ul>';
                 for(comment of comments_js[f[0]]) {
                   {%if user.is_authenticated%}
-                    popupText += `<li><span onclick="editComment(${comment.id}); localStorage.openPopupIcao24='${f[0]}' " id="commentContent${comment.id}">${comment.content}</span></li>`;
+                    popupText += `<li><span onclick="editComment(${comment.id}, ${comment.user});  localStorage.openPopupIcao24='${f[0]}' " id="commentContent${comment.id}">${comment.content}</span></li>`;
                   {% else %}
                     popupText += `<li>${ comment.content }</li>`
                   {% endif %}
@@ -335,6 +336,7 @@
       .then((res) => res.json())
       .then((data) => {
         if (data.states) {
+          
           let f = data.states[0];
             // Same as updatePlaneMarkers() ----> 
             let comments_js = [];
@@ -343,7 +345,8 @@
               if(! ('{{comment.plane}}' in comments_js)) comments_js['{{comment.plane}}'] = [];
               comments_js['{{comment.plane}}'].push({'content': '{{comment.content}}',
                   'date': '{{comment.date}}',
-                  'id': '{{comment.id}}'
+                  'id': '{{comment.id}}',
+                  'user': '{{comment.user_id}}'
               });
               i++;
             {% endfor %}
@@ -399,7 +402,7 @@
                 for(comment of comments_js[f[0]]) {
 
                   {%if user.is_authenticated%}
-                    popupText += `<li><span onclick="editComment(${comment.id}); localStorage.openPopupIcao24='${f[0]}'" id="commentContent${comment.id}">${comment.content}</span></li>`;
+                    popupText += `<li><span onclick="editComment(${comment.id}, ${comment.user}); localStorage.openPopupIcao24='${f[0]}'" id="commentContent${comment.id}">${comment.content}</span></li>`;
                   {% else %}
                     popupText += `<li>${ comment.content }</li>`
                   {% endif %}
@@ -552,10 +555,15 @@
     document.getElementById('signup').classList.remove('signup-show');
     document.getElementById('signup').classList.add('signup-hide');
   }
-  function editComment(comment_id) {
+  function editComment(comment_id, comment_user_id) {
+
+    console.log('{{ user.id}}', comment_user_id)
+
+    if ('{{ user.id}}' == comment_user_id){
     comment_content = document.getElementById('commentContent' + comment_id).textContent;
     document.getElementById('commentContent' + comment_id).onclick=null;
     document.getElementById('commentContent' + comment_id).innerHTML=`<form method="POST" action="/comments/${comment_id}/update/">{% csrf_token %}<input type="text" name="content" value="${comment_content}"><input type="submit" class="btn-small red" value="Update"></form>`
+   }
   }
 
 
