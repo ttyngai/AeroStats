@@ -153,7 +153,7 @@ def create_passenger(request):
   #form.instance.user = request.user  # Add logged in user to form.
   print(form)
   if form.is_valid():
-    print("Fom is valid!")
+
     new_passenger = form.save(commit=False)
     new_passenger.save()
     Plane.objects.get(id=plane.id).passengers.add(new_passenger.id)

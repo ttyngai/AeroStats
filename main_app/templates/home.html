@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 <!-- Map container -->
-<map onclick="hideWatchlist(); hideMenu(); hideLogin(); hideSignup(); menuUnclickedColor()">
+<map onclick="hideWatchlist(); hideMenu(); hideLogin(); hideSignup(); menuUnclickedColor();">
   <div id="map" class="map-style"></div>
 </map>
 <!-- Menu Button -->
@@ -106,6 +106,10 @@
 </watchlist>
 
 <script>
+
+ 
+
+
   // San Fransico as default map location
   let latMax = 38;
   let latMin = 37;
@@ -173,10 +177,7 @@
   // render planes in area
   async function updatePlaneMarkers() {
     // Remove all plane markers before updating
-
     document.getElementsByClassName('leaflet-marker-pane')[0].innerHTML = '';
-    // L.Icon.Default.imagePath =
-    //   'https://www.clipartmax.com/png/full/333-3330249_113-origami-icons-plane-icon-outline-png.png';
     let gotBounds = map.getBounds();
     await fetch(
       `https://opensky-network.org/api/states/all?lamin=${gotBounds._southWest.lat}&lomin=${gotBounds._southWest.lng}&lamax=${gotBounds._northEast.lat}&lomax=${gotBounds._northEast.lng}`
@@ -186,7 +187,8 @@
         if (data.states) {
           data.states.forEach(function (f) {
             /* Isolate comments based on icao24. */
-            let comments_js = [];
+ // Same as updatePlaneMarkers() ----> 
+ let comments_js = [];
             let i = 0;
             {% for comment in comments %}
               if(! ('{{comment.plane}}' in comments_js)) comments_js['{{comment.plane}}'] = [];
@@ -200,15 +202,6 @@
             {% for plane in watchlist %}
               watchlist.push('{{plane.icao24}}');
             {% endfor %}
-
-    //         passenger=[];
-    //         <!-- for passenger in planes.passengers.all -->
-    // <!-- list this passenger out -->
-// pass into passenger as a array (push) it
-// filter by icao24 first, 
-// make assiciation from backend to the front end. already in watch_db with passengers
-
-
             if (f[1] && f[5] && f[6]) {
               popupText = `
                 <h5>Aircraft Details</h5>
@@ -227,8 +220,6 @@
                 <div>Lat: ${f[6].toFixed(2)}°N Long: ${f[5].toFixed(2)}°W</div>
                 <br>
                 <h5>Passengers:</h5>
-                
-
                 {% if passengers %}
                   <ul>
                     {% for passenger in passengers %}
@@ -247,7 +238,7 @@
                     {% csrf_token %}
                     <input type="text" name="name" maxlength="50" required id="id_name" placeholder="Passenger name...">
                     <input value="${f[0]}" type="hidden" name="icao24">
-                    <input type="submit" value="Create Passenger" class="btn">
+                    <input type="submit" value="Create Passenger" onclick="localStorage.openPopupIcao24='${f[0]}'"  class="btn">
                   </form>
                 </div>
                 `;
@@ -275,7 +266,7 @@
                 <form action="/planes/create/" method="post">
                   {% csrf_token %}
                   <input value="${f[0]}" type="hidden" name="icao24">
-                  <input type="submit" onclick="localStorage.openWatchlist=true;" value="Add to Watchlist" class="btn">
+                  <input type="submit" onclick="localStorage.openWatchlist=true; " value="Add to Watchlist" class="btn">
                 </form>
                 {% endif %}
                 `;
@@ -287,13 +278,12 @@
                     {% csrf_token %}
                     <input type="text" name="content" maxlength="50" required id="id_name" placeholder="Comment content...">
                     <input value="${f[0]}" type="hidden" name="icao24">
-                    <input type="submit" value="Create Comment" class="btn">
+                    <input type="submit" value="Create Comment" onclick="localStorage.openPopupIcao24='${f[0]}'" class="btn">
                   </form>
                 </div>
                 `;
               }
-
-
+          // Same as updatePlaneMarkers() ---->
               L.marker([f[6], f[5]], { icon: planeMarker })
                 .addTo(map)
                 .bindPopup(popupText);
@@ -325,6 +315,7 @@
       autoRefreshFindPlane(icao24);
     }, 10000);
   }
+  
 
   // Find plane with given icao24
   async function findPlane(icao24) {
@@ -335,27 +326,113 @@
       .then((res) => res.json())
       .then((data) => {
         if (data.states) {
-          let plane = data.states[0];
-          map.setView([plane[6], plane[5]], 9);
-          L.marker([plane[6], plane[5]])
+          let f = data.states[0];
+            // Same as updatePlaneMarkers() ----> 
+            let comments_js = [];
+            let i = 0;
+            {% for comment in comments %}
+              if(! ('{{comment.plane}}' in comments_js)) comments_js['{{comment.plane}}'] = [];
+              comments_js['{{comment.plane}}'].push({'content': '{{comment.content}}',
+                  'date': '{{comment.date}}',
+                  'id': '{{comment.id}}'
+              });
+              i++;
+            {% endfor %}
+            watchlist = [];
+            {% for plane in watchlist %}
+              watchlist.push('{{plane.icao24}}');
+            {% endfor %}
+            if (f[1] && f[5] && f[6]) {
+              popupText = `
+                <h5>Aircraft Details</h5>
+                <div>Place of Origin: ${f[2].toUpperCase()}</div>
+                <div>Callsign: ${f[1].toUpperCase()}</div>
+                <div>Transponder: ${f[0].toUpperCase()}</div>
+                <br>
+                <div>${
+                    f[8] ? 'Aircraft Grounded' : `Airborne: ${f[7]} m `
+                }</div>
+                <div>Airspeed: ${f[9]} m/s</div>
+                <div>Bearing: ${
+                    f[10]
+                }°N</div>
+                <div>${f[11] < 0 ? 'Descending' : 'Ascending'} at ${Math.abs(f[11])} m/s</div>
+                <div>Lat: ${f[6].toFixed(2)}°N Long: ${f[5].toFixed(2)}°W</div>
+                <br>
+                <h5>Passengers:</h5>
+                {% if passengers %}
+                  <ul>
+                    {% for passenger in passengers %}
+                      <li>{{ passenger.name }}</li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  No passengers on this plane.
+                {% endif %}
+              `;
+              if( watchlist.includes(f[0])) {         
+                popupText += `
+                <div>
+                  Create new passenger and add:
+                  <form action="/passengers/create/" method="post">
+                    {% csrf_token %}
+                    <input type="text" name="name" maxlength="50" required id="id_name" placeholder="Passenger name...">
+                    <input value="${f[0]}" type="hidden" name="icao24">
+                    <input type="submit" value="Create Passenger" onclick="localStorage.openPopupIcao24='${f[0]}'"  class="btn">
+                  </form>
+                </div>
+                `;
+              }
+              popupText += `
+              <br>
+                <h5>Comments:</h5>`
+              if(comments_js[f[0]] && comments_js[f[0]].length > 0) {
+                popupText += '<ul>';
+                for(comment of comments_js[f[0]]) {
+                  console.log(comment)
+                  {%if user.is_authenticated%}
+                    popupText += `<li><span onclick="editComment(${comment.id})" id="commentContent${comment.id}">${comment.content}</span></li>`;
+                  {% else %}
+                    popupText += `<li>${ comment.content }</li>`
+                  {% endif %}
+                }
+                popupText += '</ul>'
+              } else {
+                popupText += 'No comments on this plane.'
+              }
+              if(! watchlist.includes(f[0])) {
+                popupText += `
+                {% if user.is_authenticated %}
+                <form action="/planes/create/" method="post">
+                  {% csrf_token %}
+                  <input value="${f[0]}" type="hidden" name="icao24">
+                  <input type="submit" onclick="localStorage.openWatchlist=true; " value="Add to Watchlist" class="btn">
+                </form>
+                {% endif %}
+                `;
+              } else {
+                popupText += `
+                <div>
+                  Create new comment and add:
+                  <form action="/comments/create/" method="post">
+                    {% csrf_token %}
+                    <input type="text" name="content" maxlength="50" required id="id_name" placeholder="Comment content...">
+                    <input value="${f[0]}" type="hidden" name="icao24">
+                    <input type="submit" value="Create Comment" onclick="localStorage.openPopupIcao24='${f[0]}'" class="btn">
+                  </form>
+                </div>
+                `;
+              }
+          // Same as updatePlaneMarkers() ---->
+          map.setView([f[6], f[5]], 9);
+          L.marker([f[6], f[5]])
             .addTo(map)
-            .bindPopup(
-              `<h5>Aircraft Details</h5><div>Place of Origin: ${plane[2].toUpperCase()}</div><div>Callsign: ${plane[1].toUpperCase()}</div><div>Transponder: ${plane[0].toUpperCase()}</div><br><div>${
-                plane[8] ? 'Aircraft Grounded' : `Airborne: ${plane[7]} m `
-              }</div><div>Airspeed: ${plane[9]} m/s</div><div>Bearing: ${
-                plane[10]
-              }°N</div><div>${
-                plane[11] < 0 ? 'Descending' : 'Ascending'
-              } at ${Math.abs(plane[11])} m/s</div><div>Lat: ${plane[6].toFixed(
-                2
-              )}°N Long: ${plane[5].toFixed(
-                2
-              )}°W</div><br>`
-            )
+            .bindPopup(popupText)
             .openPopup();
+
+          }
         }
       });
-
     updatePlaneMarkers();
   }
 
@@ -373,6 +450,13 @@
     if (localStorage.openWatchlist) {
       showWatchlist(); hideMenu(); hideWatchlist()
       delete localStorage.openWatchlist
+    }
+  }
+  openPopupOnReload()
+  function openPopupOnReload(){
+    if (localStorage.openPopupIcao24) {
+      findPlane(localStorage.openPopupIcao24)
+      delete localStorage.openPopupIcao24
     }
   }
   function showWatchlist() {
@@ -453,6 +537,11 @@
     document.getElementById('commentContent' + comment_id).onclick=null;
     document.getElementById('commentContent' + comment_id).innerHTML=`<form method="POST" action="/comments/${comment_id}/update/">{% csrf_token %}<input type="text" name="content" value="${comment_content}"><input type="submit" value="Update"></form>`
   }
+
+
+
 </script>
 
 {% endblock %}
+
+
