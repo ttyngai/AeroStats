@@ -176,5 +176,9 @@ a {
   display: none;
 }
 #comments2 {
-  display: none;
+  display: block;
+}
+
+#watchListButton {
+  display: block;
 }
