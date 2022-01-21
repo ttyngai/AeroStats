@@ -21,7 +21,7 @@ def home(request):
   signup_form = UserCreationForm()
   passengers = Passenger.objects.all()
   comments = Comment.objects.all()
-
+  
   if (watch_db and len(watch_db) != 0):
     query_url = f'https://opensky-network.org/api/states/all?icao24={watch_db[0].icao24}'
 
