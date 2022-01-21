@@ -127,6 +127,7 @@
     [latMin, longMax],
     [latMax, longMin],
   ]);
+  map.setMaxBounds([[-65,180],[90,-180]]);
   L.tileLayer(
     'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
     {
@@ -162,7 +163,7 @@
   }
 
   var planeMarker = L.icon({
-    iconUrl: 'static/images/red_plane.png',
+    iconUrl: 'static/images/orange_plane.png',
     iconSize: [20, 20], // size of the icon
     shadowSize: [0, 0], // size of the shadow
     iconAnchor: [0, 0], // point of the icon which will correspond to marker's location
