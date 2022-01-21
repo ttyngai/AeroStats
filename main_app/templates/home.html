@@ -21,7 +21,7 @@
 <menu-button>
   <div id="menu-button" class="menu-style">
     <a href="#" onclick="toggleMenu(); toggleMenuColor()">
-      <span id="menu_button" class="btn menu-button">MENU</span>
+      <span id="menu_button" class="btn-small menu-button">MENU</span>
     </a>
   </div>
 </menu-button>
@@ -84,16 +84,16 @@
               <td>n/a</td>
             {%endif%}
             {%if plane_detail.callsign != 'n/a'%}
-              <td><a class="btn" href = "#" onclick="hideWatchlist(); findPlane('{{plane_detail.icao24}}')">Locate</a></td>
+              <td><a class="btn-small" href = "#" onclick="hideWatchlist(); findPlane('{{plane_detail.icao24}}')">Locate</a></td>
             {% else %}
-              <td><a class="btn" disabled href = "#" onclick="hideWatchlist(); findPlane('{{plane_detail.icao24}}')">Offline</a></td>
+              <td><a class="btn-small" disabled href = "#" onclick="hideWatchlist(); findPlane('{{plane_detail.icao24}}')">Offline</a></td>
             {% endif%}
             {%for plane in watchlist%}
               {% if plane_detail.icao24 == plane.icao24 %}
                 <td>
                   <form action="planes/{{plane.id}}/delete/" method="POST">
                     {% csrf_token %}
-                    <input type="submit" value="X" class="btn btn-delete" onclick="localStorage.openWatchlist=true;" ></input>
+                    <input type="submit" value="X" class="btn-small red" onclick="localStorage.openWatchlist=true;" ></input>
                   </form>
                 </td>
               {%endif%}
@@ -187,6 +187,7 @@
         if (data.states) {
           data.states.forEach(function (f) {
             /* Isolate comments based on icao24. */
+            
  // Same as updatePlaneMarkers() ----> 
  let comments_js = [];
             let i = 0;
@@ -218,7 +219,7 @@
                 }°N</div>
                 <div>${f[11] < 0 ? 'Descending' : 'Ascending'} at ${Math.abs(f[11])} m/s</div>
                 <div>Lat: ${f[6].toFixed(2)}°N Long: ${f[5].toFixed(2)}°W</div>
-                <br>
+
                 <h5>Passengers:</h5>
                 {% if passengers %}
                   <ul>
@@ -233,25 +234,24 @@
               if( watchlist.includes(f[0])) {         
                 popupText += `
                 <div>
-                  Create new passenger and add:
                   <form action="/passengers/create/" method="post">
                     {% csrf_token %}
                     <input type="text" name="name" maxlength="50" required id="id_name" placeholder="Passenger name...">
                     <input value="${f[0]}" type="hidden" name="icao24">
-                    <input type="submit" value="Create Passenger" onclick="localStorage.openPopupIcao24='${f[0]}'"  class="btn">
+                    <input type="submit" value="Create Passenger" onclick="localStorage.openPopupIcao24='${f[0]}'"  class="btn-small">
                   </form>
                 </div>
                 `;
               }
               popupText += `
-              <br>
+              
                 <h5>Comments:</h5>`
               if(comments_js[f[0]] && comments_js[f[0]].length > 0) {
                 popupText += '<ul>';
                 for(comment of comments_js[f[0]]) {
                   console.log(comment)
                   {%if user.is_authenticated%}
-                    popupText += `<li><span onclick="editComment(${comment.id})" id="commentContent${comment.id}">${comment.content}</span></li>`;
+                    popupText += `<li><span onclick="editComment(${comment.id}); localStorage.openPopupIcao24='${f[0]}' " id="commentContent${comment.id}">${comment.content}</span></li>`;
                   {% else %}
                     popupText += `<li>${ comment.content }</li>`
                   {% endif %}
@@ -266,19 +266,18 @@
                 <form action="/planes/create/" method="post">
                   {% csrf_token %}
                   <input value="${f[0]}" type="hidden" name="icao24">
-                  <input type="submit" onclick="localStorage.openWatchlist=true; " value="Add to Watchlist" class="btn">
+                  <input type="submit" onclick="localStorage.openWatchlist=true; " value="Add to Watchlist" class="btn-small">
                 </form>
                 {% endif %}
                 `;
               } else {
                 popupText += `
                 <div>
-                  Create new comment and add:
                   <form action="/comments/create/" method="post">
                     {% csrf_token %}
                     <input type="text" name="content" maxlength="50" required id="id_name" placeholder="Comment content...">
                     <input value="${f[0]}" type="hidden" name="icao24">
-                    <input type="submit" value="Create Comment" onclick="localStorage.openPopupIcao24='${f[0]}'" class="btn">
+                    <input type="submit" value="Create Comment" onclick="localStorage.openPopupIcao24='${f[0]}'" class="btn-small">
                   </form>
                 </div>
                 `;
@@ -358,7 +357,7 @@
                 }°N</div>
                 <div>${f[11] < 0 ? 'Descending' : 'Ascending'} at ${Math.abs(f[11])} m/s</div>
                 <div>Lat: ${f[6].toFixed(2)}°N Long: ${f[5].toFixed(2)}°W</div>
-                <br>
+
                 <h5>Passengers:</h5>
                 {% if passengers %}
                   <ul>
@@ -373,25 +372,24 @@
               if( watchlist.includes(f[0])) {         
                 popupText += `
                 <div>
-                  Create new passenger and add:
                   <form action="/passengers/create/" method="post">
                     {% csrf_token %}
                     <input type="text" name="name" maxlength="50" required id="id_name" placeholder="Passenger name...">
                     <input value="${f[0]}" type="hidden" name="icao24">
-                    <input type="submit" value="Create Passenger" onclick="localStorage.openPopupIcao24='${f[0]}'"  class="btn">
+                    <input type="submit" value="Create Passenger" onclick="localStorage.openPopupIcao24='${f[0]}'"  class="btn-small">
                   </form>
                 </div>
                 `;
               }
               popupText += `
-              <br>
+              
                 <h5>Comments:</h5>`
               if(comments_js[f[0]] && comments_js[f[0]].length > 0) {
                 popupText += '<ul>';
                 for(comment of comments_js[f[0]]) {
                   console.log(comment)
                   {%if user.is_authenticated%}
-                    popupText += `<li><span onclick="editComment(${comment.id})" id="commentContent${comment.id}">${comment.content}</span></li>`;
+                    popupText += `<li><span onclick="editComment(${comment.id}); localStorage.openPopupIcao24='${f[0]}'" id="commentContent${comment.id}">${comment.content}</span></li>`;
                   {% else %}
                     popupText += `<li>${ comment.content }</li>`
                   {% endif %}
@@ -406,19 +404,18 @@
                 <form action="/planes/create/" method="post">
                   {% csrf_token %}
                   <input value="${f[0]}" type="hidden" name="icao24">
-                  <input type="submit" onclick="localStorage.openWatchlist=true; " value="Add to Watchlist" class="btn">
+                  <input type="submit" onclick="localStorage.openWatchlist=true; " value="Add to Watchlist" class="btn-small">
                 </form>
                 {% endif %}
                 `;
               } else {
                 popupText += `
                 <div>
-                  Create new comment and add:
                   <form action="/comments/create/" method="post">
                     {% csrf_token %}
                     <input type="text" name="content" maxlength="50" required id="id_name" placeholder="Comment content...">
                     <input value="${f[0]}" type="hidden" name="icao24">
-                    <input type="submit" value="Create Comment" onclick="localStorage.openPopupIcao24='${f[0]}'" class="btn">
+                    <input type="submit" value="Create Comment" onclick="localStorage.openPopupIcao24='${f[0]}'" class="btn-small">
                   </form>
                 </div>
                 `;
@@ -535,7 +532,7 @@
   function editComment(comment_id) {
     comment_content = document.getElementById('commentContent' + comment_id).textContent;
     document.getElementById('commentContent' + comment_id).onclick=null;
-    document.getElementById('commentContent' + comment_id).innerHTML=`<form method="POST" action="/comments/${comment_id}/update/">{% csrf_token %}<input type="text" name="content" value="${comment_content}"><input type="submit" value="Update"></form>`
+    document.getElementById('commentContent' + comment_id).innerHTML=`<form method="POST" action="/comments/${comment_id}/update/">{% csrf_token %}<input type="text" name="content" value="${comment_content}"><input type="submit" class="btn-small red" value="Update"></form>`
   }
 
 
