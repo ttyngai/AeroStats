@@ -7,9 +7,11 @@
 <nav-container>
   <div id="nav" class="nav-hide nav-container">
     <ul class="nav-content">
+      <li><a href="#" class="btn nav-button" onclick="changeTheme()">Change Theme</a></li>
       {% if user.is_authenticated %}
         <li><a href="#" class="btn nav-button" onclick="showWatchlist(); hideMenu(); hideWatchlist(); menuUnclickedColor()">Watchlist</a></li>
         <li><a href="#" class="btn nav-button" onclick="gotoMyLocation(); hideMenu(); hideWatchlist(); menuUnclickedColor()">My Location</a></li>
+
         <li><a class="btn nav-button" href="/accounts/logout/?next=/">Logout</a></li>
       {% else %}
         <li><a href="#" class="btn nav-button" onclick="showLogin(); hideMenu(); hideSignup(); menuUnclickedColor()">Log In</a></li>
@@ -107,7 +109,6 @@
 
 <script>
 
- 
 
 
   // San Fransico as default map location
@@ -131,6 +132,9 @@
     [latMin, longMax],
     [latMax, longMin],
   ]);
+  // map color
+  let mapTheme = 'mapbox/outdoors-v11';
+  if (localStorage.theme != '') { mapTheme = localStorage.theme}
   map.setMaxBounds([[-65,180],[90,-180]]);
   L.tileLayer(
     'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
@@ -138,7 +142,7 @@
       attribution:
         'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
       maxZoom: 18,
-      id: 'mapbox/streets-v11',
+      id: mapTheme,
       tileSize: 512,
       zoomOffset: -1,
       accessToken:
@@ -503,6 +507,19 @@
   function menuUnclickedColor(){
       document.getElementById('menu_button').style.backgroundColor = '#26a69a'
       menuClicked = false
+  }
+
+  function changeTheme(){
+    if (localStorage.theme == 'mapbox/outdoors-v11'){
+      localStorage.theme = 'mapbox/navigation-night-v1'
+    } else if (localStorage.theme == 'mapbox/navigation-night-v1'){
+      localStorage.theme = 'mapbox/dark-v10'
+    } else if (localStorage.theme == 'mapbox/dark-v10'){
+      localStorage.theme = 'mapbox/satellite-v9'
+    } else {
+      localStorage.theme = 'mapbox/outdoors-v11'
+    }
+    window.location.href = '/'
   }
 
   function hideMenu() {
