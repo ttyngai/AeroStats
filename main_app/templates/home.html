@@ -22,7 +22,7 @@
 <!-- Nav Buttons container -->
 <menu-button>
   <div id="menu-button" class="menu-style">
-    <a href="#" onclick="toggleMenu(); toggleMenuColor()">
+    <a href="#" onclick="toggleMenu(); toggleMenuColor(); map.closePopup()">
       <span id="menu_button" class="btn-small menu-button">MENU</span>
     </a>
   </div>
@@ -542,6 +542,7 @@
     document.getElementById('login').classList.add('login-show');
     document.getElementById('watchlist').classList.remove('watchlist-show');
     document.getElementById('watchlist').classList.add('watchlist-hide');
+    map.closePopup()
   }
   function hideLogin() {
     document.getElementById('login').classList.remove('login-show');
@@ -552,6 +553,7 @@
     document.getElementById('signup').classList.add('signup-show');
     document.getElementById('watchlist').classList.remove('watchlist-show');
     document.getElementById('watchlist').classList.add('watchlist-hide');
+    map.closePopup()
   }
   function hideSignup() {
     document.getElementById('signup').classList.remove('signup-show');
