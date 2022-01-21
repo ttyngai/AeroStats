@@ -2,9 +2,19 @@
 
 ---
 
-Welcome to [AeroStats](https://aerostats.herokuapp.com/)!
+Welcome to [AeroStats]
 
-AeroStats is an app designed for aviation enthusiasts to track flights in real time. The app combines a transponder data API and a mapping API, which plots all planes in a specific window on the map. Every plane on the map will be clickable to reveal its velocity, heading direction, country of origin etc. Users can also login and save planes to their watchlist, as well as add passengers and comments to each flight. Planes in the watchlist that are still airborne will have a "Locate" button that will pull you to that planes current location on the map. Planes that are no longer in flight will read "Offline" in the watchlist. Users can make updates to passengers and comments, and users can also delete flights, passengers, and comments as well. Users can click "My Location" in the menu to move the map window to their current location.
+Please click this link to start application:
+(https://aerostats.herokuapp.com/)!
+
+AeroStats is an app designed for aviation enthusiasts to track flights in real time. The app combines a transponder data API and a mapping API, which plots all planes in a specific window on the map.
+
+- Every plane on the map will be clickable to reveal its velocity, heading direction, country of origin etc.
+- Users can also login and save planes to their watchlist, as well as add passengers and comments to each flight.
+- Planes in the watchlist that are still airborne will have a "Locate" button that will pull you to that planes current location on the map.
+- Planes that are no longer in flight will read "Offline" in the watchlist. Users can make updates to passengers and comments, and users can also delete flights, passengers, and comments as well.
+- Users can click "My Location" in the menu to move the map window to their current location.
+- Users can also change theme of map(Nightmode, Satellite etc)
 
 ## Screenshots
 
@@ -34,4 +44,4 @@ HTML, CSS, JavaScript, Django, Python, PostgreSQL, Heroku, OpenSky Network API, 
 
 - Plug in destination and arrival API for plane details ($)
 - Save locations of interest ie. 'Home', 'Hawaii', etc.
-- Controls for manipulating map view style
+- Track + move of planes
