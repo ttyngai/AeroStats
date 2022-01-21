@@ -190,7 +190,8 @@
             {% for comment in comments %}
               if(! ('{{comment.plane}}' in comments_js)) comments_js['{{comment.plane}}'] = [];
               comments_js['{{comment.plane}}'].push({'content': '{{comment.content}}',
-                  'date': '{{comment.date}}'
+                  'date': '{{comment.date}}',
+                  'id': '{{comment.id}}'
               });
               i++;
             {% endfor %}
