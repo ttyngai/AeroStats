@@ -278,7 +278,7 @@
                 <form action="/planes/create/" method="post">
                   {% csrf_token %}
                   <input value="${f[0]}" type="hidden" name="icao24">
-                  <input type="submit" onclick="localStorage.openWatchlist=true; " value="Add to Watchlist" class="btn-small">
+                  <input type="submit" onclick="localStorage.openPopupIcao24='${f[0]}'" value="Add to Watchlist" class="btn-small">
                 </form>
                 {% endif %}
                 `;
@@ -419,7 +419,7 @@
                 <form action="/planes/create/" method="post">
                   {% csrf_token %}
                   <input value="${f[0]}" type="hidden" name="icao24">
-                  <input type="submit" onclick="localStorage.openWatchlist=true; " value="Add to Watchlist" class="btn-small">
+                  <input type="submit" onclick="localStorage.openPopupIcao24='${f[0]}'" value="Add to Watchlist" class="btn-small">
                 </form>
                 {% endif %}
                 `;
