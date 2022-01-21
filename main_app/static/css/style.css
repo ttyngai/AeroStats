@@ -34,7 +34,7 @@ a {
   background-color: white;
   opacity: 0.9;
   /* margin: 0 auto; */
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
 }
 
 .watchlist-container {
@@ -93,7 +93,7 @@ a {
 .nav-container {
   position: absolute;
   padding: 10px;
-  top: 5vh;
+  top: 4vh;
   right: 1vw;
   z-index: 0;
 }
@@ -118,8 +118,6 @@ a {
   top: 1vh;
   right: 1vw;
   z-index: 0;
-  background-color: white;
-  opacity: 0.8;
 }
 
 .nav-content {
@@ -133,6 +131,9 @@ a {
 
 .menu-button {
   font-size: 18px;
+}
+.btn-small {
+  transform: scale(0.85);
 }
 
 .btn-delete {
@@ -148,7 +149,8 @@ a {
 }
 
 ::-webkit-scrollbar {
-  width: 2px;
+  width: 4px;
+  height: 4px;
   border: 1px solid #d5d5d5;
 }
 
