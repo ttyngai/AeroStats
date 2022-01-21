@@ -82,6 +82,14 @@ a {
   display: none;
 }
 
+.signup-show {
+  display: block;
+}
+
+.signup-hide {
+  display: none;
+}
+
 .nav-container {
   position: absolute;
   padding: 10px;

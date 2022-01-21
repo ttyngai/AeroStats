@@ -13,6 +13,7 @@
         <li><a class="btn nav-button" href="/accounts/logout/?next=/">Logout</a></li>
       {% else %}
         <li><a href="#" class="btn nav-button" onclick="showLogin(); hideMenu();  menuUnclickedColor()">Log In</a></li>
+        <li><a href="#" class="btn nav-button" onclick="showSignup(); hideMenu();  menuUnclickedColor()">Sign Up</a></li>
       {% endif %}
   </div>
 </nav-container>
@@ -36,6 +37,18 @@
     </form>
   </div>
 </login>
+<!-- Signup window -->
+<signup>
+  <div id="signup" class="login-style signup-hide">
+    <h1>Sign Up</h1>
+    <form action="/accounts/signup/" method="POST">
+      {% csrf_token %}
+      {{ signup_form.as_p }}
+      <input type="submit" class="btn" value="Sign Up">
+      <input type="hidden" name="next" value="/">
+    </form>
+  </div>
+</signup>
 <!-- Watchlist -->
 <watchlist>
   <div id="watchlist" class="watchlist-hide watchlist-style">
@@ -101,7 +114,6 @@
   // User's last viewed map location
   let newBounds;
   if (localStorage.aeroStatsBounds) {
-    console.log(localStorage.aeroStatsBounds);
     newBounds = JSON.parse(localStorage.aeroStatsBounds);
     latMax = newBounds._northEast.lat;
     latMin = newBounds._southWest.lat;
@@ -174,10 +186,9 @@
           data.states.forEach(function (f) {
             /* Isolate comments based on icao24. */
             let comments_js = [];
-            console.log(comments_js);
             let i = 0;
             {% for comment in comments %}
-              comments_js['{{comment.plane}}'] = [];
+              if(! ('{{comment.plane}}' in comments_js)) comments_js['{{comment.plane}}'] = [];
               comments_js['{{comment.plane}}'].push({'content': '{{comment.content}}',
                   'date': '{{comment.date}}'
               });
@@ -247,11 +258,10 @@
               popupText += `
               <br>
                 <h5>Comments:</h5>`
-                console.log(comments_js[f[0]]);
               if(comments_js[f[0]] && comments_js[f[0]].length > 0) {
                 popupText += '<ul>';
                 for(comment of comments_js[f[0]]) {
-                  console.log(comment);
+                  console.log(comment)
                   {%if user.is_authenticated%}
                     popupText += `<li><span onclick="editComment(${comment.id})" id="commentContent${comment.id}">${comment.content}</span></li>`;
                   {% else %}
@@ -275,12 +285,6 @@
               } else {
                 popupText += `
                 <div>
-                  Add a comment:
-                  <form action="/planes/{{plane.id}}/assoc_comment/" method="post">
-                    {% csrf_token %}
-                    <input value="${f[0]}" type="hidden" name="icao24">
-                    <input type="submit" onclick="localStorage.openWatchlist=true;" value="Add Comment" class="btn">
-                  </form>
                   Create new comment and add:
                   <form action="/comments/create/" method="post">
                     {% csrf_token %}
@@ -333,7 +337,6 @@
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         if (data.states) {
           let plane = data.states[0];
           map.setView([plane[6], plane[5]], 9);
@@ -353,8 +356,6 @@
               )}°W</div><br>`
             )
             .openPopup();
-        } else {
-          console.log(`${icao24} Not Active`);
         }
       });
 
@@ -439,6 +440,16 @@
   function hideLogin() {
     document.getElementById('login').classList.remove('login-show');
     document.getElementById('login').classList.add('login-hide');
+  }
+  function showSignup() {
+    document.getElementById('signup').classList.remove('signup-hide');
+    document.getElementById('signup').classList.add('signup-show');
+    document.getElementById('watchlist').classList.remove('watchlist-show');
+    document.getElementById('watchlist').classList.add('watchlist-hide');
+  }
+  function hideSignup() {
+    document.getElementById('signup').classList.remove('signup-show');
+    document.getElementById('signup').classList.add('signup-hide');
   }
   function editComment(comment_id) {
     comment_content = document.getElementById('commentContent' + comment_id).textContent;

@@ -2,7 +2,8 @@ from fileinput import close
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from random import sample
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Plane, Passenger, Comment
@@ -17,8 +18,8 @@ def home(request):
 
   watchlist=[]
   login_form = AuthenticationForm()
+  signup_form = UserCreationForm()
   passengers = Passenger.objects.all()
-  # comments = Comment.objects.filter(plane = request.)
   comments = Comment.objects.all()
 
   if (watch_db and len(watch_db) != 0):
@@ -70,6 +71,7 @@ def home(request):
   return render(request, 'home.html', {
     'watchlist': watch_db,
     'login_form': login_form,
+    'signup_form': signup_form,
     'watchlist_populated': watchlist,
     'passengers': passengers,
     'comments': comments,
@@ -117,16 +119,14 @@ def planes_detail(request, plane_id):
 
 @login_required
 def add_comment(request):
-  plane = Plane.objects.get(icao24=request.POST['icao24'])
-  print('hello')
+  print(request.user)
+  plane = Plane.objects.filter(icao24=request.POST['icao24']).filter(user=request.user)[0]
   form = CommentForm(request.POST)
   form.instance.user = request.user
   form.instance.plane_id = plane.id
-  print(form)
   if form.is_valid():
     new_comment = form.save(commit=False)
     new_comment.save()
-    print('oh no')
   return redirect('home')
 
 class CommentUpdate(LoginRequiredMixin, UpdateView):
@@ -170,3 +170,19 @@ class PassengerUpdate(LoginRequiredMixin, UpdateView):
 
 class PassengerDelete(LoginRequiredMixin, DeleteView):
   model = Passenger
+
+def signup(request):
+  error_message = ''
+  if request.method == 'POST':
+    form = UserCreationForm(request.POST)
+    if form.is_valid():
+      # Handle good POSTs.
+      user = form.save()  # Save user to DB.
+      login(request, user)  # Log user in, FFS!
+      return redirect('home')
+    else:
+      error_message = 'Invalid sign up - try again soon!'
+  # Handle all GETs and bad POSTs.
+  form = UserCreationForm()
+  context = {'form': form, 'error_message': error_message}
+  return redirect('home')
