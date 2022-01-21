@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 <!-- Map container -->
-<map onclick="hideWatchlist(); hideMenu(); menuUnclickedColor()">
+<map onclick="hideWatchlist(); hideMenu(); hideLogin(); hideSignup(); menuUnclickedColor()">
   <div id="map" class="map-style"></div>
 </map>
 <!-- Menu Button -->
@@ -12,8 +12,8 @@
         <li><a href="#" class="btn nav-button" onclick="gotoMyLocation(); hideMenu(); hideWatchlist(); menuUnclickedColor()">My Location</a></li>
         <li><a class="btn nav-button" href="/accounts/logout/?next=/">Logout</a></li>
       {% else %}
-        <li><a href="#" class="btn nav-button" onclick="showLogin(); hideMenu();  menuUnclickedColor()">Log In</a></li>
-        <li><a href="#" class="btn nav-button" onclick="showSignup(); hideMenu();  menuUnclickedColor()">Sign Up</a></li>
+        <li><a href="#" class="btn nav-button" onclick="showLogin(); hideMenu(); hideSignup(); menuUnclickedColor()">Log In</a></li>
+        <li><a href="#" class="btn nav-button" onclick="showSignup(); hideMenu(); hideLogin(); menuUnclickedColor()">Sign Up</a></li>
       {% endif %}
   </div>
 </nav-container>
@@ -162,7 +162,7 @@
   }
 
   var planeMarker = L.icon({
-    iconUrl: 'static/images/plane_icon.png',
+    iconUrl: 'static/images/red_plane.png',
     iconSize: [20, 20], // size of the icon
     shadowSize: [0, 0], // size of the shadow
     iconAnchor: [0, 0], // point of the icon which will correspond to marker's location
@@ -199,6 +199,15 @@
             {% for plane in watchlist %}
               watchlist.push('{{plane.icao24}}');
             {% endfor %}
+
+    //         passenger=[];
+    //         <!-- for passenger in planes.passengers.all -->
+    // <!-- list this passenger out -->
+// pass into passenger as a array (push) it
+// filter by icao24 first, 
+// make assiciation from backend to the front end. already in watch_db with passengers
+
+
             if (f[1] && f[5] && f[6]) {
               popupText = `
                 <h5>Aircraft Details</h5>
@@ -217,6 +226,8 @@
                 <div>Lat: ${f[6].toFixed(2)}°N Long: ${f[5].toFixed(2)}°W</div>
                 <br>
                 <h5>Passengers:</h5>
+                
+
                 {% if passengers %}
                   <ul>
                     {% for passenger in passengers %}
@@ -227,25 +238,9 @@
                   No passengers on this plane.
                 {% endif %}
               `;
-              if(! watchlist.includes(f[0])) {
-                popupText += `
-                {% if user.is_authenticated %}
-                <form action="/planes/create/" method="post">
-                  {% csrf_token %}
-                  <input value="${f[0]}" type="hidden" name="icao24">
-                  <input type="submit" onclick="localStorage.openWatchlist=true;" value="Add to Watchlist" class="btn">
-                </form>
-                {% endif %}
-                `;
-              } else {
+              if( watchlist.includes(f[0])) {         
                 popupText += `
                 <div>
-                  Add a passenger:
-                  <form action="/planes/{{plane.id}}/assoc_passenger/" method="post">
-                    {% csrf_token %}
-                    <input value="${f[0]}" type="hidden" name="icao24">
-                    <input type="submit" onclick="localStorage.openWatchlist=true;" value="Add Passenger" class="btn">
-                  </form>
                   Create new passenger and add:
                   <form action="/passengers/create/" method="post">
                     {% csrf_token %}

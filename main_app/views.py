@@ -15,7 +15,7 @@ def home(request):
     watch_db = Plane.objects.filter(user = request.user)
   else:
     watch_db = None
-
+# watch_db.passengers
   watchlist=[]
   login_form = AuthenticationForm()
   signup_form = UserCreationForm()
@@ -70,6 +70,7 @@ def home(request):
         watchlist.append(f)
   return render(request, 'home.html', {
     'watchlist': watch_db,
+    # contains watch_db.passengers
     'login_form': login_form,
     'signup_form': signup_form,
     'watchlist_populated': watchlist,
