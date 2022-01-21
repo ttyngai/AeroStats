@@ -272,7 +272,7 @@
                 }
                 popupText += '</ul><div>'
               } else {
-                popupText += `<div id="comments"><h5>Comments</h5>No comments on this plane.</div>`
+                popupText += `<div id="comments"><h5>Comments</h5>No comments on this plane.<br></div>`
               }
               if(! watchlist.includes(f[0])) {
                 popupText += `
@@ -583,16 +583,16 @@
       document.getElementById('comments').style.display = 'none'
     document.getElementById('comments2').style.display = 'none'
     document.getElementById('passengers').style.display = 'none'
-    document.getElementById('passengers2').style.display = 'none'
     document.getElementById('commentButton').style.backgroundColor = "#26a69a"
+    document.getElementById('passengers2').style.display = 'none'
 
 
     } else {
       document.getElementById('comments').style.display = 'block'
-    document.getElementById('comments2').style.display = 'block'
-    document.getElementById('passengers').style.display = 'block'
+      document.getElementById('comments2').style.display = 'block'
+      document.getElementById('passengers').style.display = 'block'
+      document.getElementById('commentButton').style.backgroundColor = 'grey'
     document.getElementById('passengers2').style.display = 'block'
-    document.getElementById('commentButton').style.backgroundColor = 'grey'
 
     }
 
