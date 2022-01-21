@@ -21,7 +21,7 @@ def home(request):
   signup_form = UserCreationForm()
   passengers = Passenger.objects.all()
   comments = Comment.objects.all()
-  
+
   if (watch_db and len(watch_db) != 0):
     query_url = f'https://opensky-network.org/api/states/all?icao24={watch_db[0].icao24}'
 
@@ -120,7 +120,6 @@ def planes_detail(request, plane_id):
 
 @login_required
 def add_comment(request):
-  print(request.user)
   plane = Plane.objects.filter(icao24=request.POST['icao24']).filter(user=request.user)[0]
   form = CommentForm(request.POST)
   form.instance.user = request.user
@@ -146,12 +145,14 @@ def assoc_passenger(request, plane_id):
 
 @login_required
 def create_passenger(request):
-  plane = Plane.objects.get(icao24=request.POST['icao24'])
-  print("Plane ID", plane.id)
-  print("Passengers:", plane.passengers)
+  print('Plane user req',request.user.id)
+  # plane = Plane.objects.get(icao24=request.POST['icao24'])
+  plane = Plane.objects.filter(icao24=request.POST['icao24']).filter(user=request.user)[0]
+  print('plane user plane',plane.user_id)
+
   form = PassengerForm(request.POST)
   #form.instance.user = request.user  # Add logged in user to form.
-  print(form)
+
   if form.is_valid():
 
     new_passenger = form.save(commit=False)
