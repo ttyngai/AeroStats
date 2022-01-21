@@ -134,7 +134,7 @@
   ]);
   // map color
   let mapTheme = 'mapbox/outdoors-v11';
-  if (localStorage.theme != 'mapbox/outdoors-v11') { mapTheme = localStorage.theme}
+  if (localStorage.theme != '' &&  mapTheme != 'mapbox/outdoors-v11') { mapTheme = localStorage.theme}
   map.setMaxBounds([[-65,180],[90,-180]]);
   L.tileLayer(
     'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
