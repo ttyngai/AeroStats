@@ -165,3 +165,20 @@ a {
   border-radius: 0;
   background: #b0b0b0;
 }
+
+#passengers {
+  display: none;
+}
+#passengers2 {
+  display: none;
+}
+#comments {
+  display: none;
+}
+#comments2 {
+  display: none;
+}
+
+#watchListButton {
+  display: block;
+}

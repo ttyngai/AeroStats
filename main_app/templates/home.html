@@ -198,9 +198,8 @@
           data.states.forEach(function (f) {
             /* Isolate comments based on icao24. */
             
- // Same as updatePlaneMarkers() ----> 
- 
- let comments_js = [];
+            // Same as updatePlaneMarkers() ----> 
+            let comments_js = [];
             let i = 0;
             {% for comment in comments %}
               if(! ('{{comment.plane}}' in comments_js)) comments_js['{{comment.plane}}'] = [];
@@ -231,8 +230,12 @@
                 }°N</div>
                 <div>${f[11] < 0 ? 'Descending' : 'Ascending'} at ${Math.abs(f[11])} m/s</div>
                 <div>Lat: ${f[6].toFixed(2)}°N Long: ${f[5].toFixed(2)}°W</div>
+              
+              <h5 onclick="toggleComments()" class="btn-small" id="commentButton">More</h5>
 
-                <h5>Passengers:</h5>
+                <hr>
+                <div id="passengers">
+                  <h5>Passengers</h5>
                 {% if passengers %}
                   <ul>
                     {% for passenger in passengers %}
@@ -242,49 +245,49 @@
                 {% else %}
                   No passengers on this plane.
                 {% endif %}
+                </div>
               `;
               if( watchlist.includes(f[0])) {         
                 popupText += `
-                <div>
+                <div id="passengers2">
                   <form action="/passengers/create/" method="post">
                     {% csrf_token %}
                     <input type="text" name="name" maxlength="50" required id="id_name" placeholder="Passenger name...">
                     <input value="${f[0]}" type="hidden" name="icao24">
-                    
                     <input type="submit" value="Create Passenger" onclick="localStorage.openPopupIcao24='${f[0]}'"  class="btn-small">
                   </form>
                 </div>
                 `;
               }
-              popupText += `
               
-                <h5>Comments:</h5>`
               if(comments_js[f[0]] && comments_js[f[0]].length > 0) {
-                popupText += '<ul>';
+                popupText += '<div id="comments"><h5>Comments</h5><ul>';
                 for(comment of comments_js[f[0]]) {
+
                   {%if user.is_authenticated%}
-                    popupText += `<li><span onclick="editComment(${comment.id}, ${comment.user});  localStorage.openPopupIcao24='${f[0]}' " id="commentContent${comment.id}">${comment.content}</span></li>`;
+                    popupText += `<li ><span onclick="editComment(${comment.id}, ${comment.user}); localStorage.openPopupIcao24='${f[0]}'" id="commentContent${comment.id}">${comment.content}</span></li>`;
                   {% else %}
                     popupText += `<li>${ comment.content }</li>`
                   {% endif %}
                 }
-                popupText += '</ul>'
+                popupText += '</ul><div>'
               } else {
-                popupText += 'No comments on this plane.'
+                popupText += `<div id="comments"><h5>Comments</h5>No comments on this plane.</div>`
               }
               if(! watchlist.includes(f[0])) {
                 popupText += `
                 {% if user.is_authenticated %}
+                <div id="comments2">
                 <form action="/planes/create/" method="post">
                   {% csrf_token %}
                   <input value="${f[0]}" type="hidden" name="icao24">
-                  <input type="submit" onclick="localStorage.openWatchlist=true; " value="Add to Watchlist" class="btn-small">
-                </form>
+                  <input type="submit" onclick="localStorage.openPopupIcao24='${f[0]}'" value="Add to Watchlist" class="btn-small">
+                </form></div>
                 {% endif %}
                 `;
               } else {
                 popupText += `
-                <div>
+                <div id="comments2">
                   <form action="/comments/create/" method="post">
                     {% csrf_token %}
                     <input type="text" name="content" maxlength="50" required id="id_name" placeholder="Comment content...">
@@ -371,9 +374,12 @@
                 }°N</div>
                 <div>${f[11] < 0 ? 'Descending' : 'Ascending'} at ${Math.abs(f[11])} m/s</div>
                 <div>Lat: ${f[6].toFixed(2)}°N Long: ${f[5].toFixed(2)}°W</div>
+              
+              <h5 onclick="toggleComments()" class="btn-small" id="commentButton">More</h5>
 
-                <h5>Passengers:</h5>
-                
+                <hr>
+                <div id="passengers">
+                  <h5>Passengers</h5>
                 {% if passengers %}
                   <ul>
                     {% for passenger in passengers %}
@@ -383,10 +389,11 @@
                 {% else %}
                   No passengers on this plane.
                 {% endif %}
+                </div>
               `;
               if( watchlist.includes(f[0])) {         
                 popupText += `
-                <div>
+                <div id="passengers2">
                   <form action="/passengers/create/" method="post">
                     {% csrf_token %}
                     <input type="text" name="name" maxlength="50" required id="id_name" placeholder="Passenger name...">
@@ -396,36 +403,35 @@
                 </div>
                 `;
               }
-              popupText += `
               
-                <h5>Comments:</h5>`
               if(comments_js[f[0]] && comments_js[f[0]].length > 0) {
-                popupText += '<ul>';
+                popupText += '<div id="comments"><h5>Comments</h5><ul>';
                 for(comment of comments_js[f[0]]) {
 
                   {%if user.is_authenticated%}
-                    popupText += `<li><span onclick="editComment(${comment.id}, ${comment.user}); localStorage.openPopupIcao24='${f[0]}'" id="commentContent${comment.id}">${comment.content}</span></li>`;
+                    popupText += `<li ><span onclick="editComment(${comment.id}, ${comment.user}); localStorage.openPopupIcao24='${f[0]}'" id="commentContent${comment.id}">${comment.content}</span></li>`;
                   {% else %}
                     popupText += `<li>${ comment.content }</li>`
                   {% endif %}
                 }
-                popupText += '</ul>'
+                popupText += '</ul><div>'
               } else {
-                popupText += 'No comments on this plane.'
+                popupText += `<div id="comments"><h5>Comments</h5>No comments on this plane.</div>`
               }
               if(! watchlist.includes(f[0])) {
                 popupText += `
                 {% if user.is_authenticated %}
+                <div id="comments2">
                 <form action="/planes/create/" method="post">
                   {% csrf_token %}
                   <input value="${f[0]}" type="hidden" name="icao24">
-                  <input type="submit" onclick="localStorage.openWatchlist=true; " value="Add to Watchlist" class="btn-small">
-                </form>
+                  <input type="submit" onclick="localStorage.openPopupIcao24='${f[0]}'" value="Add to Watchlist" class="btn-small">
+                </form></div>
                 {% endif %}
                 `;
               } else {
                 popupText += `
-                <div>
+                <div id="comments2">
                   <form action="/comments/create/" method="post">
                     {% csrf_token %}
                     <input type="text" name="content" maxlength="50" required id="id_name" placeholder="Comment content...">
@@ -567,6 +573,29 @@
    }
   }
 
+
+
+  
+  function toggleComments(){
+    if (document.getElementById('passengers').style.display == 'block'){
+      document.getElementById('comments').style.display = 'none'
+    document.getElementById('comments2').style.display = 'none'
+    document.getElementById('passengers').style.display = 'none'
+    document.getElementById('passengers2').style.display = 'none'
+    document.getElementById('commentButton').style.backgroundColor = "#26a69a"
+
+
+    } else {
+      document.getElementById('comments').style.display = 'block'
+    document.getElementById('comments2').style.display = 'block'
+    document.getElementById('passengers').style.display = 'block'
+    document.getElementById('passengers2').style.display = 'block'
+    document.getElementById('commentButton').style.backgroundColor = 'grey'
+
+    }
+
+
+  }
 
 
 </script>
