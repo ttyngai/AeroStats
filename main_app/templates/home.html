@@ -8,9 +8,9 @@
   <div id="nav" class="nav-hide nav-container">
     <ul class="nav-content">
       <li><a href="#" class="btn nav-button" onclick="changeTheme()">Change Theme</a></li>
+      <li><a href="#" class="btn nav-button" onclick="gotoMyLocation(); hideMenu(); hideWatchlist(); menuUnclickedColor()">My Location</a></li>
       {% if user.is_authenticated %}
         <li><a href="#" class="btn nav-button" onclick="showWatchlist(); hideMenu(); hideWatchlist(); menuUnclickedColor()">Watchlist</a></li>
-        <li><a href="#" class="btn nav-button" onclick="gotoMyLocation(); hideMenu(); hideWatchlist(); menuUnclickedColor()">My Location</a></li>
 
         <li><a class="btn nav-button" href="/accounts/logout/?next=/">Logout</a></li>
       {% else %}
