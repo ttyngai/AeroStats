@@ -1,1 +1,1 @@
-web: gunicorn aerostats.wsgi
+web: gunicorn aerostats.wsgi:application
