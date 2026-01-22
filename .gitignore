@@ -27,6 +27,9 @@ staticfiles/
 # OS
 .DS_Store
 
+# Claude session log (local only)
+claude.md
+
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
