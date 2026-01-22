@@ -8,8 +8,10 @@ a {
   padding: 0 5px;
 } */
 
-.leaflet-interactive {
-  transform: rotate(90deg);
+/* Plane icon wrapper - no default background/border */
+.plane-icon-wrapper {
+  background: transparent !important;
+  border: none !important;
 }
 
 .watchlist-show {

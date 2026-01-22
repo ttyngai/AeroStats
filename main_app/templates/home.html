@@ -175,17 +175,19 @@
     }, 10000);
   }
 
-  var planeMarker = L.icon({
-    iconUrl: 'static/images/orange_plane.png',
-    iconSize: [20, 20], // size of the icon
-    shadowSize: [0, 0], // size of the shadow
-    iconAnchor: [10, 10], // center of icon for proper rotation
-    shadowAnchor: [0, 0], // the same for the shadow
-    popupAnchor: [0, -20], // point from which the popup should open relative to the iconAnchor
-  });
-
   // Track markers by icao24 to enable in-place updates (no blinking)
   let planeMarkers = {};
+
+  // Create a rotated icon for a given bearing
+  function createRotatedIcon(bearing) {
+    return L.divIcon({
+      className: 'plane-icon-wrapper',
+      html: `<img src="static/images/orange_plane.png" style="width:20px;height:20px;transform:rotate(${bearing}deg);">`,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+      popupAnchor: [0, -10]
+    });
+  }
   // Helper function to generate popup text for an aircraft
   function generatePopupText(f) {
     let comments_js = [];
@@ -284,13 +286,10 @@
     return popupText;
   }
 
-  // Helper function to update marker rotation
+  // Helper function to update marker rotation using setIcon
   function setMarkerRotation(marker, bearing) {
-    let icon = marker.getElement();
-    if (icon) {
-      icon.style.transformOrigin = 'center';
-      icon.style.transform = icon.style.transform.replace(/rotate\([^)]*\)/, '') + ` rotate(${bearing}deg)`;
-    }
+    marker.setIcon(createRotatedIcon(bearing));
+    marker._bearing = bearing; // Store bearing for reference
   }
 
   // render planes in area - with in-place updates (no blinking)
@@ -317,15 +316,17 @@
               // Update existing marker position and popup
               planeMarkers[icao24].setLatLng(newLatLng);
               planeMarkers[icao24].setPopupContent(popupText);
-              setMarkerRotation(planeMarkers[icao24], bearing);
+              // Only update icon if bearing changed significantly
+              if (Math.abs((planeMarkers[icao24]._bearing || 0) - bearing) > 1) {
+                setMarkerRotation(planeMarkers[icao24], bearing);
+              }
             } else {
-              // Create new marker
-              let marker = L.marker(newLatLng, { icon: planeMarker })
+              // Create new marker with rotated icon
+              let marker = L.marker(newLatLng, { icon: createRotatedIcon(bearing) })
                 .addTo(map)
                 .bindPopup(popupText);
+              marker._bearing = bearing;
               planeMarkers[icao24] = marker;
-              // Set rotation after marker is added to DOM
-              setTimeout(() => setMarkerRotation(marker, bearing), 0);
             }
           }
         });
@@ -377,14 +378,16 @@
             planeMarkers[icao24].setLatLng([f[6], f[5]]);
             planeMarkers[icao24].setPopupContent(popupText);
             planeMarkers[icao24].openPopup();
-            setMarkerRotation(planeMarkers[icao24], bearing);
+            if (Math.abs((planeMarkers[icao24]._bearing || 0) - bearing) > 1) {
+              setMarkerRotation(planeMarkers[icao24], bearing);
+            }
           } else {
-            let marker = L.marker([f[6], f[5]], { icon: planeMarker })
+            let marker = L.marker([f[6], f[5]], { icon: createRotatedIcon(bearing) })
               .addTo(map)
               .bindPopup(popupText)
               .openPopup();
+            marker._bearing = bearing;
             planeMarkers[icao24] = marker;
-            setTimeout(() => setMarkerRotation(marker, bearing), 0);
           }
         }
       }
