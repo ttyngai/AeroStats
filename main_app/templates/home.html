@@ -167,13 +167,36 @@
     getNewbounds();
   });
 
-  // Auto update planes
+  // Auto update planes with idle detection
+  let lastActivity = Date.now();
+  let isPaused = false;
+  let autoUpdateTimer = null;
+  const IDLE_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+  const REFRESH_INTERVAL = 10000; // 10 seconds
+
   function autoUpdate() {
+    if (Date.now() - lastActivity > IDLE_TIMEOUT) {
+      isPaused = true;
+      console.log('Auto-refresh paused due to inactivity');
+      return;
+    }
     updatePlaneMarkers();
-    setTimeout(function () {
-      autoUpdate();
-    }, 10000);
+    autoUpdateTimer = setTimeout(autoUpdate, REFRESH_INTERVAL);
   }
+
+  function resumeIfPaused() {
+    lastActivity = Date.now();
+    if (isPaused) {
+      isPaused = false;
+      console.log('Auto-refresh resumed');
+      autoUpdate();
+    }
+  }
+
+  // Listen for user activity to resume refresh
+  ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'].forEach(event => {
+    document.addEventListener(event, resumeIfPaused, { passive: true });
+  });
 
   // Track markers by icao24 to enable in-place updates (no blinking)
   let planeMarkers = {};
