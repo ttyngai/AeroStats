@@ -155,17 +155,6 @@
         'pk.eyJ1IjoidC1jaGFyYWxhbXBvdXMtcGRpIiwiYSI6ImNsNzcxMjB6aDI2aXkzb3J4OGhvb3hjcmoifQ.RCjrd8dVkglrrzLrVJpN6Q',
     }
   ).addTo(map);
-  // Initialize plane markers + updates
-  autoUpdate();
-  // Remove leftover shadow layer upon map creation
-  document.getElementsByClassName('leaflet-shadow-pane')[0].remove();
-
-  map.on('moveend', async function () {
-    // call update plane marker function
-    updatePlaneMarkers();
-    // User's last viewed map location, stored in localStorage
-    getNewbounds();
-  });
 
   // Auto update planes with idle detection
   let lastActivity = Date.now();
@@ -196,6 +185,18 @@
   // Listen for user activity to resume refresh
   ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'].forEach(event => {
     document.addEventListener(event, resumeIfPaused, { passive: true });
+  });
+
+  // Initialize plane markers + updates
+  autoUpdate();
+  // Remove leftover shadow layer upon map creation
+  document.getElementsByClassName('leaflet-shadow-pane')[0].remove();
+
+  map.on('moveend', async function () {
+    // call update plane marker function
+    updatePlaneMarkers();
+    // User's last viewed map location, stored in localStorage
+    getNewbounds();
   });
 
   // Track markers by icao24 to enable in-place updates (no blinking)
