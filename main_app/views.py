@@ -9,26 +9,136 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Plane, Passenger, Comment
 from .forms import PlaneForm, PassengerForm, CommentForm
-import requests
+import math
 import string
+import time
+import requests
 
-OPENSKY_STATES_URL = 'https://opensky-network.org/api/states/all'
-OPENSKY_HEADERS = {'User-Agent': 'AeroStats/1.0'}
+AIRCRAFT_HEADERS = {'User-Agent': 'AeroStats/1.0'}
+ADSB_BASE_URL = 'https://api.adsb.lol/v2'
+EARTH_RADIUS_NM = 3440.065
+FT_TO_M = 0.3048
+KT_TO_MS = 0.514444
+FT_PER_MIN_TO_MS = 0.00508
+HEX_CHARS = set(string.hexdigits)
 
 
-def fetch_opensky_states(params):
-  response = requests.get(
-    OPENSKY_STATES_URL,
-    params=params,
-    timeout=15,
-    headers=OPENSKY_HEADERS,
+def _normalize_icao24(value):
+  icao24 = (value or '').strip().lower().lstrip('~')
+  if not icao24 or len(icao24) > 8 or any(ch not in HEX_CHARS for ch in icao24):
+    return None
+  return icao24
+
+
+def _haversine_nm(lat1, lon1, lat2, lon2):
+  phi1, phi2 = math.radians(lat1), math.radians(lat2)
+  dphi = math.radians(lat2 - lat1)
+  dlambda = math.radians(lon2 - lon1)
+  a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
+  return 2 * EARTH_RADIUS_NM * math.atan2(math.sqrt(a), math.sqrt(max(0, 1 - a)))
+
+
+def _bbox_to_point_radius(lamin, lomin, lamax, lomax):
+  lat = (lamin + lamax) / 2
+  lon = (lomin + lomax) / 2
+  radius = max(
+    _haversine_nm(lat, lon, lamin, lomin),
+    _haversine_nm(lat, lon, lamin, lomax),
+    _haversine_nm(lat, lon, lamax, lomin),
+    _haversine_nm(lat, lon, lamax, lomax),
   )
+  return lat, lon, max(1, min(int(math.ceil(radius)), 250))
+
+
+def _adsb_to_state(ac):
+  icao24 = _normalize_icao24(ac.get('hex'))
+  lat = ac.get('lat')
+  lon = ac.get('lon')
+  if not icao24 or lat is None or lon is None:
+    return None
+
+  alt = ac.get('alt_baro')
+  on_ground = alt == 'ground'
+  if on_ground:
+    alt_m = 0
+  else:
+    if alt is None:
+      alt = ac.get('alt_geom')
+    try:
+      alt_m = float(alt) * FT_TO_M if alt is not None else None
+    except (TypeError, ValueError):
+      alt_m = None
+
+  gs = ac.get('gs')
+  try:
+    velocity = float(gs) * KT_TO_MS if gs is not None else None
+  except (TypeError, ValueError):
+    velocity = None
+
+  vertical = ac.get('baro_rate')
+  if vertical is None:
+    vertical = ac.get('geom_rate')
+  try:
+    vertical_rate = float(vertical) * FT_PER_MIN_TO_MS if vertical is not None else 0
+  except (TypeError, ValueError):
+    vertical_rate = 0
+
+  callsign = (ac.get('flight') or '').strip() or icao24
+  origin = (ac.get('r') or 'n/a').strip() or 'n/a'
+  track = ac.get('track') or 0
+  return [
+    icao24,
+    callsign,
+    origin,
+    None,
+    None,
+    lon,
+    lat,
+    alt_m,
+    on_ground,
+    velocity,
+    track,
+    vertical_rate,
+    None,
+    None,
+    ac.get('squawk'),
+    False,
+    0,
+  ]
+
+
+def _in_bbox(lat, lon, params):
+  return params['lamin'] <= lat <= params['lamax'] and params['lomin'] <= lon <= params['lomax']
+
+
+def fetch_aircraft_states(params):
+  """Return OpenSky-shaped state vectors from adsb.lol (OpenSky blocks AWS IPs)."""
+  if 'icao24' in params:
+    icaos = params['icao24'] if isinstance(params['icao24'], (list, tuple)) else [params['icao24']]
+    url = f"{ADSB_BASE_URL}/icao/{','.join(icaos)}"
+  else:
+    lat, lon, radius = _bbox_to_point_radius(
+      params['lamin'], params['lomin'], params['lamax'], params['lomax']
+    )
+    url = f"{ADSB_BASE_URL}/lat/{lat}/lon/{lon}/dist/{radius}"
+
+  response = requests.get(url, timeout=10, headers=AIRCRAFT_HEADERS)
   response.raise_for_status()
-  return response.json()
+  aircraft = response.json().get('ac') or []
+  states = []
+  use_bbox = all(key in params for key in ('lamin', 'lomin', 'lamax', 'lomax'))
+  for ac in aircraft:
+    state = _adsb_to_state(ac)
+    if not state:
+      continue
+    if use_bbox and not _in_bbox(state[6], state[5], params):
+      continue
+    states.append(state)
+  return {'time': int(time.time()), 'states': states or None}
 
 
 def opensky_states(request):
-  """Proxy OpenSky state vectors so the browser is not blocked by CORS."""
+  """Proxy live aircraft so the browser is not blocked by CORS."""
   params = {}
   bbox_keys = ('lamin', 'lomin', 'lamax', 'lomax')
   if all(key in request.GET for key in bbox_keys):
@@ -37,16 +147,15 @@ def opensky_states(request):
     except ValueError:
       return HttpResponseBadRequest('Invalid bounding box')
   elif 'icao24' in request.GET:
-    icao24 = request.GET.get('icao24', '').strip().lower()
-    allowed = set(string.hexdigits)
-    if not icao24 or len(icao24) > 8 or any(ch not in allowed for ch in icao24):
+    icao24 = _normalize_icao24(request.GET.get('icao24'))
+    if not icao24:
       return HttpResponseBadRequest('Invalid icao24')
     params = {'icao24': icao24}
   else:
     return HttpResponseBadRequest('Missing query parameters')
 
   try:
-    return JsonResponse(fetch_opensky_states(params))
+    return JsonResponse(fetch_aircraft_states(params))
   except (requests.RequestException, ValueError):
     return JsonResponse({'time': None, 'states': None, 'error': 'Unable to fetch aircraft data'}, status=502)
 
@@ -63,20 +172,15 @@ def home(request):
   comments = Comment.objects.all()
 
   if (watch_db and len(watch_db) != 0):
-    query_url = f'https://opensky-network.org/api/states/all?icao24={watch_db[0].icao24}'
-
-    for idx, plane in enumerate(watch_db):
-      if (idx > 0):
-        newString = f"&icao24={plane.icao24}"
-        query_url += newString
+    icaos = [icao for icao in (_normalize_icao24(plane.icao24) for plane in watch_db) if icao]
     try:
-      flight_data = requests.get(query_url, timeout=15, headers=OPENSKY_HEADERS).json()
+      flight_data = fetch_aircraft_states({'icao24': icaos}) if icaos else {'states': None}
     except (requests.RequestException, ValueError):
       flight_data = {'states': None}
     if(flight_data['states'] != None):
       for flight in flight_data['states']:
         for plane in watch_db:
-          if plane.icao24 == flight[0]:
+          if plane.icao24.lower() == flight[0]:
             f = {
             'icao24': flight[0],
             'callsign': flight[1],
@@ -94,7 +198,7 @@ def home(request):
     for plane in watch_db:
       not_online = True
       for f in watchlist:
-        if plane.icao24 == f['icao24']:
+        if plane.icao24.lower() == f['icao24']:
           not_online = False
       if not_online:
 
