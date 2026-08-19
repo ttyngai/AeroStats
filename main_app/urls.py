@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
   path('', views.home, name='home'),
+  path('api/states/', views.opensky_states, name='opensky_states'),
   path('planes/create/', views.add_plane, name='planes_create'),
   path('planes/<int:plane_id>/', views.planes_detail, name='detail'),
   path('planes/<int:pk>/update/', views.PlaneUpdate.as_view(), name='planes_update'),

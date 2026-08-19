@@ -1,7 +1,8 @@
-from fileinput import close
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from random import sample
 from django.shortcuts import render, redirect
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
@@ -9,6 +10,45 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Plane, Passenger, Comment
 from .forms import PlaneForm, PassengerForm, CommentForm
 import requests
+import string
+
+OPENSKY_STATES_URL = 'https://opensky-network.org/api/states/all'
+OPENSKY_HEADERS = {'User-Agent': 'AeroStats/1.0'}
+
+
+def fetch_opensky_states(params):
+  response = requests.get(
+    OPENSKY_STATES_URL,
+    params=params,
+    timeout=15,
+    headers=OPENSKY_HEADERS,
+  )
+  response.raise_for_status()
+  return response.json()
+
+
+def opensky_states(request):
+  """Proxy OpenSky state vectors so the browser is not blocked by CORS."""
+  params = {}
+  bbox_keys = ('lamin', 'lomin', 'lamax', 'lomax')
+  if all(key in request.GET for key in bbox_keys):
+    try:
+      params = {key: float(request.GET[key]) for key in bbox_keys}
+    except ValueError:
+      return HttpResponseBadRequest('Invalid bounding box')
+  elif 'icao24' in request.GET:
+    icao24 = request.GET.get('icao24', '').strip().lower()
+    allowed = set(string.hexdigits)
+    if not icao24 or len(icao24) > 8 or any(ch not in allowed for ch in icao24):
+      return HttpResponseBadRequest('Invalid icao24')
+    params = {'icao24': icao24}
+  else:
+    return HttpResponseBadRequest('Missing query parameters')
+
+  try:
+    return JsonResponse(fetch_opensky_states(params))
+  except (requests.RequestException, ValueError):
+    return JsonResponse({'time': None, 'states': None, 'error': 'Unable to fetch aircraft data'}, status=502)
 
 def home(request):
   if(request.user.is_authenticated):
@@ -29,7 +69,10 @@ def home(request):
       if (idx > 0):
         newString = f"&icao24={plane.icao24}"
         query_url += newString
-    flight_data = requests.get(f'{query_url}').json()
+    try:
+      flight_data = requests.get(query_url, timeout=15, headers=OPENSKY_HEADERS).json()
+    except (requests.RequestException, ValueError):
+      flight_data = {'states': None}
     if(flight_data['states'] != None):
       for flight in flight_data['states']:
         for plane in watch_db:
@@ -76,6 +119,7 @@ def home(request):
     'watchlist_populated': watchlist,
     'passengers': passengers,
     'comments': comments,
+    'mapbox_access_token': settings.MAPBOX_ACCESS_TOKEN,
   })
 
 

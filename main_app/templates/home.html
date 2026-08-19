@@ -151,8 +151,7 @@
       id: mapTheme,
       tileSize: 512,
       zoomOffset: -1,
-      accessToken:
-        'pk.eyJ1IjoidC1jaGFyYWxhbXBvdXMtcGRpIiwiYSI6ImNsNzcxMjB6aDI2aXkzb3J4OGhvb3hjcmoifQ.RCjrd8dVkglrrzLrVJpN6Q',
+      accessToken: '{{ mapbox_access_token }}',
     }
   ).addTo(map);
 
@@ -323,7 +322,7 @@
 
     try {
       const res = await fetch(
-        `https://opensky-network.org/api/states/all?lamin=${gotBounds._southWest.lat}&lomin=${gotBounds._southWest.lng}&lamax=${gotBounds._northEast.lat}&lomax=${gotBounds._northEast.lng}`
+        `/api/states/?lamin=${gotBounds._southWest.lat}&lomin=${gotBounds._southWest.lng}&lamax=${gotBounds._northEast.lat}&lomax=${gotBounds._northEast.lng}`
       );
       const data = await res.json();
 
@@ -385,7 +384,7 @@
   async function findPlane(icao24) {
     try {
       const res = await fetch(
-        `https://opensky-network.org/api/states/all?icao24=${icao24.toLowerCase()}`
+        `/api/states/?icao24=${icao24.toLowerCase()}`
       );
       const data = await res.json();
 

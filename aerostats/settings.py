@@ -132,6 +132,12 @@ LOGIN_REDIRECT_URL = '/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+MAPBOX_ACCESS_TOKEN = os.environ.get('MAPBOX_ACCESS_TOKEN', '')
+try:
+    from .local_settings import *
+except ImportError:
+    pass
+
 # Needs to be bottom for heroku
 # Configure Django App for Heroku.
 try:
