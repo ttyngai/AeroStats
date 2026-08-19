@@ -155,28 +155,40 @@
     }
   ).addTo(map);
 
-  // Auto update planes with idle detection
+  // Auto update planes with idle-based intervals
   let lastActivity = Date.now();
   let isPaused = false;
   let autoUpdateTimer = null;
-  const IDLE_TIMEOUT = 5 * 60 * 1000; // 5 minutes
-  const REFRESH_INTERVAL = 10000; // 10 seconds
+  const IDLE_FAST_MS = 60 * 1000;       // first minute: every 5s
+  const IDLE_MEDIUM_MS = 15 * 60 * 1000; // until 15 min idle: every 15s
+  const IDLE_STALL_MS = 60 * 60 * 1000;  // 1 hour idle: stall
+  const INTERVAL_FAST_MS = 5000;
+  const INTERVAL_MEDIUM_MS = 15000;
+  const INTERVAL_SLOW_MS = 60 * 1000;    // 15 min–1 hour idle: every 1 min
+
+  function refreshIntervalForIdle(idleMs) {
+    if (idleMs < IDLE_FAST_MS) return INTERVAL_FAST_MS;
+    if (idleMs < IDLE_MEDIUM_MS) return INTERVAL_MEDIUM_MS;
+    if (idleMs < IDLE_STALL_MS) return INTERVAL_SLOW_MS;
+    return null;
+  }
 
   function autoUpdate() {
-    if (Date.now() - lastActivity > IDLE_TIMEOUT) {
+    const interval = refreshIntervalForIdle(Date.now() - lastActivity);
+    if (interval == null) {
       isPaused = true;
-      console.log('Auto-refresh paused due to inactivity');
+      autoUpdateTimer = null;
       return;
     }
     updatePlaneMarkers();
-    autoUpdateTimer = setTimeout(autoUpdate, REFRESH_INTERVAL);
+    if (autoUpdateTimer) clearTimeout(autoUpdateTimer);
+    autoUpdateTimer = setTimeout(autoUpdate, interval);
   }
 
   function resumeIfPaused() {
     lastActivity = Date.now();
     if (isPaused) {
       isPaused = false;
-      console.log('Auto-refresh resumed');
       autoUpdate();
     }
   }
