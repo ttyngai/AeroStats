@@ -110,11 +110,11 @@
 <script>
 
 
-  // San Fransico as default map location
-  let latMax = 38;
-  let latMin = 37;
-  let longMax = -121;
-  let longMin = -123;
+  // California as default map location
+  let latMax = 42;
+  let latMin = 32.5;
+  let longMax = -114;
+  let longMin = -124.5;
   // User's last viewed map location
   let newBounds;
   if (localStorage.aeroStatsBounds) {
@@ -123,8 +123,6 @@
     latMin = newBounds._southWest.lat;
     longMax = newBounds._northEast.lng;
     longMin = newBounds._southWest.lng;
-  } else {
-    gotoMyLocation();
   }
   // Define Map
   var map = L.map('map', { tap: false }).fitBounds([
