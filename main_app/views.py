@@ -12,6 +12,7 @@ from .forms import PlaneForm, PassengerForm, CommentForm
 import math
 import string
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 
 AIRCRAFT_HEADERS = {'User-Agent': 'AeroStats/1.0'}
@@ -21,6 +22,10 @@ FT_TO_M = 0.3048
 KT_TO_MS = 0.514444
 FT_PER_MIN_TO_MS = 0.00508
 HEX_CHARS = set(string.hexdigits)
+ADSB_MAX_RADIUS_NM = 250
+ADSB_MAX_TILES = 12
+ADSB_CACHE_TTL_S = 8
+_adsb_tile_cache = {}
 
 
 def _normalize_icao24(value):
@@ -38,16 +43,69 @@ def _haversine_nm(lat1, lon1, lat2, lon2):
   return 2 * EARTH_RADIUS_NM * math.atan2(math.sqrt(a), math.sqrt(max(0, 1 - a)))
 
 
-def _bbox_to_point_radius(lamin, lomin, lamax, lomax):
+def _normalize_lon(lon):
+  while lon > 180:
+    lon -= 360
+  while lon < -180:
+    lon += 360
+  return lon
+
+
+def _lon_span(lomin, lomax):
+  span = lomax - lomin
+  if span < 0:
+    span += 360
+  return span
+
+
+def _bbox_center(lamin, lomin, lamax, lomax):
   lat = (lamin + lamax) / 2
-  lon = (lomin + lomax) / 2
-  radius = max(
-    _haversine_nm(lat, lon, lamin, lomin),
-    _haversine_nm(lat, lon, lamin, lomax),
-    _haversine_nm(lat, lon, lamax, lomin),
-    _haversine_nm(lat, lon, lamax, lomax),
+  if lomax >= lomin:
+    lon = (lomin + lomax) / 2
+  else:
+    lon = _normalize_lon(lomin + _lon_span(lomin, lomax) / 2)
+  return lat, lon
+
+
+def _bbox_width_nm(lat, lomin, lomax):
+  span = _lon_span(lomin, lomax)
+  # ±180 is the same meridian, so a full-world span cannot use haversine.
+  if span >= 359.5:
+    return max(1.0, 2 * math.pi * EARTH_RADIUS_NM * math.cos(math.radians(lat)))
+  return _haversine_nm(lat, lomin, lat, _normalize_lon(lomin + span))
+
+
+def _bbox_tiles(lamin, lomin, lamax, lomax):
+  """Cover a map bbox with adsb.lol point queries (max 250nm each)."""
+  lat_c, lon_c = _bbox_center(lamin, lomin, lamax, lomax)
+  corner_r = max(
+    _haversine_nm(lat_c, lon_c, lamin, lomin),
+    _haversine_nm(lat_c, lon_c, lamin, lomax),
+    _haversine_nm(lat_c, lon_c, lamax, lomin),
+    _haversine_nm(lat_c, lon_c, lamax, lomax),
   )
-  return lat, lon, max(1, min(int(math.ceil(radius)), 250))
+  if corner_r <= ADSB_MAX_RADIUS_NM:
+    return [(lat_c, lon_c, max(1, int(math.ceil(corner_r))))]
+
+  width_nm = _bbox_width_nm(lat_c, lomin, lomax)
+  height_nm = _haversine_nm(lamin, lon_c, lamax, lon_c)
+  spacing = ADSB_MAX_RADIUS_NM * 1.2
+  nx = max(1, math.ceil(width_nm / spacing))
+  ny = max(1, math.ceil(height_nm / spacing))
+  if nx * ny > ADSB_MAX_TILES:
+    aspect = width_nm / max(height_nm, 1)
+    nx = max(1, min(ADSB_MAX_TILES, round(math.sqrt(ADSB_MAX_TILES * aspect))))
+    ny = max(1, ADSB_MAX_TILES // nx)
+
+  lat_step = (lamax - lamin) / ny
+  lon_step = _lon_span(lomin, lomax) / nx
+  tiles = []
+  for j in range(ny):
+    lat = lamin + (j + 0.5) * lat_step
+    for i in range(nx):
+      lon = _normalize_lon(lomin + (i + 0.5) * lon_step)
+      tiles.append((lat, lon, ADSB_MAX_RADIUS_NM))
+  return tiles
 
 
 def _adsb_to_state(ac):
@@ -108,32 +166,69 @@ def _adsb_to_state(ac):
 
 
 def _in_bbox(lat, lon, params):
-  return params['lamin'] <= lat <= params['lamax'] and params['lomin'] <= lon <= params['lomax']
+  if not (params['lamin'] <= lat <= params['lamax']):
+    return False
+  lon = _normalize_lon(lon)
+  lomin, lomax = params['lomin'], params['lomax']
+  if lomin <= lomax:
+    return lomin <= lon <= lomax
+  return lon >= lomin or lon <= lomax
+
+
+def _fetch_adsb_url(url):
+  now = time.time()
+  cached = _adsb_tile_cache.get(url)
+  if cached and now - cached[0] < ADSB_CACHE_TTL_S:
+    return cached[1]
+  response = requests.get(url, timeout=8, headers=AIRCRAFT_HEADERS)
+  response.raise_for_status()
+  aircraft = response.json().get('ac') or []
+  _adsb_tile_cache[url] = (now, aircraft)
+  if len(_adsb_tile_cache) > 64:
+    expired = [key for key, (ts, _) in _adsb_tile_cache.items() if now - ts >= ADSB_CACHE_TTL_S]
+    for key in expired:
+      _adsb_tile_cache.pop(key, None)
+  return aircraft
 
 
 def fetch_aircraft_states(params):
   """Return OpenSky-shaped state vectors from adsb.lol (OpenSky blocks AWS IPs)."""
   if 'icao24' in params:
     icaos = params['icao24'] if isinstance(params['icao24'], (list, tuple)) else [params['icao24']]
-    url = f"{ADSB_BASE_URL}/icao/{','.join(icaos)}"
+    urls = [f"{ADSB_BASE_URL}/icao/{','.join(icaos)}"]
+    use_bbox = False
   else:
-    lat, lon, radius = _bbox_to_point_radius(
-      params['lamin'], params['lomin'], params['lamax'], params['lomax']
-    )
-    url = f"{ADSB_BASE_URL}/lat/{lat}/lon/{lon}/dist/{radius}"
+    tiles = _bbox_tiles(params['lamin'], params['lomin'], params['lamax'], params['lomax'])
+    urls = [f"{ADSB_BASE_URL}/lat/{lat}/lon/{lon}/dist/{radius}" for lat, lon, radius in tiles]
+    use_bbox = True
 
-  response = requests.get(url, timeout=10, headers=AIRCRAFT_HEADERS)
-  response.raise_for_status()
-  aircraft = response.json().get('ac') or []
-  states = []
-  use_bbox = all(key in params for key in ('lamin', 'lomin', 'lamax', 'lomax'))
+  aircraft = []
+  errors = []
+  if len(urls) == 1:
+    try:
+      aircraft = list(_fetch_adsb_url(urls[0]))
+    except (requests.RequestException, ValueError) as exc:
+      errors.append(exc)
+  else:
+    with ThreadPoolExecutor(max_workers=min(6, len(urls))) as pool:
+      futures = {pool.submit(_fetch_adsb_url, url): url for url in urls}
+      for future in as_completed(futures):
+        try:
+          aircraft.extend(future.result())
+        except (requests.RequestException, ValueError) as exc:
+          errors.append(exc)
+  if not aircraft and errors:
+    raise errors[0]
+
+  states_by_icao = {}
   for ac in aircraft:
     state = _adsb_to_state(ac)
     if not state:
       continue
     if use_bbox and not _in_bbox(state[6], state[5], params):
       continue
-    states.append(state)
+    states_by_icao[state[0]] = state
+  states = list(states_by_icao.values())
   return {'time': int(time.time()), 'states': states or None}
 
 
